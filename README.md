@@ -1,2 +1,2 @@
-# ml-learning-journey
-AI/ML Engineer in progress — building solid foundations, step by step.
+# ml-from-scratch
+Data Scientist/ML Engineer in progress — building solid foundations, step by step.
