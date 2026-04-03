@@ -7,7 +7,7 @@ class LinearRegression:
             self, # self references to the current instance of the class
             learning_rate=0.01, 
             n_iters=1000,
-            batch_size=None,
+            batch_size=None, # None for full batch, or specify an integer for mini-batch size (or 1 for stochastic)
             regularization=None,   # None | "l1" (Lasso) | "l2" (Ridge)
             lambda_reg=0.0): 
         
@@ -37,8 +37,7 @@ class LinearRegression:
         self.b = 0
 
         # If batch_size is None, then full batch gradient descent
-        if self.batch_size is None:
-            self.batch_size = n_samples
+        batch_size = self.batch_size if self.batch_size is not None else n_samples
 
         # Training loop
         for _ in range(self.n_iters):
@@ -49,8 +48,8 @@ class LinearRegression:
             y_shuffled = y[indices]
 
             # Mini-batch gradient descent
-            for start in range(0, n_samples, self.batch_size):
-                end = start + self.batch_size
+            for start in range(0, n_samples, batch_size):
+                end = start + batch_size
                 X_batch = X_shuffled[start:end]
                 y_batch = y_shuffled[start:end]
 
@@ -60,6 +59,8 @@ class LinearRegression:
             y_pred = self.predict(X)
             loss = self._compute_loss(y, y_pred)
             self.losses.append(loss)
+            self.weight_history.append(self.w.copy())
+            self.bias_history.append(self.b)
 
     # Predict method to make predictions using the learned weights and bias
     def predict(self, X):
