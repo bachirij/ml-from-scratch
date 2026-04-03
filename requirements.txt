@@ -1,7 +1,16 @@
+# Data 
 numpy
 pandas
+jupyter
+
+# Data visualization
 matplotlib
+
+# Models
 scikit-learn
 torch
-jupyter
+
+# Production
 joblib
+fastapi 
+uvicorn
