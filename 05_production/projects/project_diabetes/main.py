@@ -1,7 +1,7 @@
 # FastAPI app — serves the LinearRegression model trained on the diabetes dataset
 # Model source: 02_classical_ml/01_linear_regression/models/linear_regression_scratch.pkl
 
-from fastapi import FastAPI,HTTPException
+from fastapi import FastAPI, HTTPException
 from schemas import PredictRequest
 
 import joblib
