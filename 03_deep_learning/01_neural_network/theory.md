@@ -6,7 +6,7 @@
 
 ### Logistic regression as a single neuron
 
-You already built logistic regression. A single logistic neuron does this:
+We already built logistic regression. A single logistic neuron does this:
 
 ```
 Input X → Linear combination Z = WX + b → Sigmoid σ(Z) → Output ŷ ∈ (0, 1)
@@ -16,11 +16,11 @@ This is powerful, but it has a fundamental limitation: it can only learn **linea
 
 ### Why a single neuron fails on non-linear problems
 
-Consider the XOR problem, or two concentric circles (class 0 inside, class 1 outside). No straight line can separate them. A single neuron — no matter how trained — will never solve this.
+Consider the XOR problem, or two concentric circles (class 0 inside, class 1 outside). No straight line can separate them. A single neuron, no matter how trained, will never solve this.
 
 ### The solution: stack neurons into layers
 
-The key insight is this: if you stack multiple neurons in parallel, they each learn a different **linear combination** of the inputs. Then the next layer combines those combinations — and that composition of linear transformations, passed through non-linear activations, can represent **non-linear boundaries**.
+The key insight is this: if you stack multiple neurons in parallel, they each learn a different **linear combination** of the inputs. Then the next layer combines those combinations, and that composition of linear transformations, passed through non-linear activations, can represent **non-linear boundaries**.
 
 One hidden layer with enough neurons can theoretically approximate any continuous function (Universal Approximation Theorem). In practice, deeper networks learn more efficiently.
 
@@ -133,7 +133,7 @@ This is crucial: **during the forward pass, each layer must store $Z^{[l]}$ and 
 
 They will be needed during the backward pass to compute gradients. Without them, backpropagation cannot be computed.
 
-This is exactly what Keras and PyTorch do internally — they build a "computation graph" that remembers all intermediate values.
+This is exactly what Keras and PyTorch do internally, they build a "computation graph" that remembers all intermediate values.
 
 ---
 
@@ -152,7 +152,7 @@ No matter how many layers, without activation it reduces to one matrix multiplic
 
 $$\sigma(z) = \frac{1}{1 + e^{-z}}$$
 
-Output range: $(0, 1)$ — useful for binary classification outputs.
+Output range: $(0, 1)$, useful for binary classification outputs.
 
 **Derivative:**
 $$\sigma'(z) = \sigma(z)(1 - \sigma(z))$$
@@ -161,7 +161,7 @@ This is a key result you will use constantly during backpropagation. If you alre
 
 $$\sigma'(Z) = A \cdot (1 - A)$$
 
-No need to recompute from Z — this is why storing A during forward pass is efficient.
+No need to recompute from Z, this is why storing A during forward pass is efficient.
 
 ### Other common activation functions (for reference)
 
@@ -185,7 +185,7 @@ Where:
 
 - $m$ = number of samples
 - $y^{(i)}$ = true label for sample $i$
-- $\hat{y}^{(i)} = A^{[L](i)}$ = predicted probability for sample $i$
+- $\hat{y}^{(i)}$ = $A^{[L](i)}$ = predicted probability for sample $i$
 
 The loss measures how far the network's predictions are from the true labels. The goal of training is to minimize this value.
 
@@ -207,7 +207,7 @@ To avoid writing long chains, we define:
 
 $$\delta^{[l]} = \frac{\partial \mathcal{L}}{\partial Z^{[l]}}$$
 
-This is the gradient of the loss with respect to the **pre-activation** of layer $l$. It is the central quantity in backpropagation — once you have it for a layer, you can compute everything else for that layer.
+This is the gradient of the loss with respect to the **pre-activation** of layer $l$. It is the central quantity in backpropagation, once you have it for a layer, you can compute everything else for that layer.
 
 ### Step 1 — Gradient at the output layer
 
@@ -229,7 +229,7 @@ $$\delta^{[L]} = \frac{\partial \mathcal{L}}{\partial A^{[L]}} \cdot A^{[L]}(1 -
 
 $$\delta^{[L]} = \frac{1}{m}(A^{[L]} - y)$$
 
-This is the same gradient form as logistic regression — the error at the output.
+This is the same gradient form as logistic regression, the error at the output.
 
 ### Step 2 — Gradients for weights and biases at layer L
 
@@ -290,7 +290,7 @@ Every layer does exactly the same 4 operations:
 | 3    | $db^{[l]} = \text{mean}(\delta^{[l]}, \text{axis}=1)$ | Bias gradient               |
 | 4    | $dA^{[l-1]} = (W^{[l]})^T \cdot \delta^{[l]}$         | Gradient for previous layer |
 
-Step 4 is the "output" of backward — it becomes the "input" (`dA`) for the layer below.
+Step 4 is the "output" of backward, it becomes the "input" (`dA`) for the layer below.
 
 ---
 
@@ -302,7 +302,7 @@ $$W^{[l]} \leftarrow W^{[l]} - \alpha \cdot \frac{\partial \mathcal{L}}{\partial
 
 $$b^{[l]} \leftarrow b^{[l]} - \alpha \cdot \frac{\partial \mathcal{L}}{\partial b^{[l]}}$$
 
-Where $\alpha$ is the learning rate. Same rule as linear and logistic regression — gradient descent is universal.
+Where $\alpha$ is the learning rate. Same rule as linear and logistic regression, gradient descent is universal.
 
 ---
 
@@ -326,7 +326,7 @@ W = np.random.randn(n_l, n_l_prev) * np.sqrt(1 / n_l_prev)
 
 This scales the random weights so that the variance of activations stays stable as you go deeper.
 
-Biases are initialized to zero — this is safe because the weight asymmetry handles the symmetry problem.
+Biases are initialized to zero, this is safe because the weight asymmetry handles the symmetry problem.
 
 ---
 
@@ -339,7 +339,7 @@ For each iteration:
   3. Update        → update W and b for every layer
 ```
 
-This is identical in structure to logistic regression — the only difference is that steps 1 and 2 now loop over multiple layers.
+This is identical in structure to logistic regression, the only difference is that steps 1 and 2 now loop over multiple layers.
 
 ---
 
