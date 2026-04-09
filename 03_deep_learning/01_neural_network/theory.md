@@ -225,7 +225,7 @@ So:
 
 $$\delta^{[L]} = \frac{\partial \mathcal{L}}{\partial A^{[L]}} \cdot A^{[L]}(1 - A^{[L]})$$
 
-**Important simplification:** When you multiply the BCE derivative by the sigmoid derivative, the expression simplifies beautifully to:
+**Important simplification:** When we multiply the BCE derivative by the sigmoid derivative, the expression simplifies to:
 
 $$\delta^{[L]} = \frac{1}{m}(A^{[L]} - y)$$
 
@@ -456,13 +456,11 @@ This 2-layer implementation is the template for any depth. The only things that 
 
 - Activation functions in hidden layers (ReLU is more common than sigmoid in practice)
 - Weight initialization strategies
-- Optimization (Adam instead of vanilla gradient descent)
+- Optimization (Adam instead of original gradient descent)
 
 ---
 
 ## 12. Review Questions
-
-Answer these from memory before writing any code.
 
 1. Why can a single logistic regression neuron not solve the `make_circles` dataset?
 
