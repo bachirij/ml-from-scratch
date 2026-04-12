@@ -4,6 +4,10 @@ def _sigmoid(z):
     z = np.clip(z, -500, 500)
     return 1 / (1 + np.exp(-z))
 
+def _sigmoid_derivative(z):
+    s = _sigmoid(z)
+    return s * (1 - s)
+
 def _relu(z):
     return np.maximum(0, z)
 
@@ -13,7 +17,7 @@ def _relu_derivative(z):
 #  Activation functions and their derivatives
 ACTIVATIONS = {
     'relu':    (_relu,    _relu_derivative),
-    'sigmoid': (_sigmoid, lambda z: _sigmoid(z) * (1 - _sigmoid(z))),
+    'sigmoid': (_sigmoid, _sigmoid_derivative),
 }
 
 # Layer class
@@ -99,7 +103,10 @@ class NeuralNetwork:
         loss = -np.sum(y * np.log(y_hat) + (1 - y) * np.log(1 - y_hat)) / m
         return loss
 
-    def fit(self, X, y, learning_rate, n_iterations):
+    def fit(self, X, y, learning_rate, n_iterations, random_seed=None):
+        # Initialize a random seed (deterministic generator)
+        if random_seed is not None:
+            np.random.seed(random_seed)
         # Initialize all layers in the network
         n_input = X.shape[1]
         for layer in self.layers:
@@ -120,4 +127,8 @@ class NeuralNetwork:
         # Forward pass over all the network
         y_hat = self.forward(X)
         return (y_hat > 0.5).astype(int)
+    
+    def predict_proba(self, X):
+        # Forward pass without threshold
+        return self.forward(X).flatten()
 
