@@ -13,11 +13,27 @@ def _relu(z):
 
 def _relu_derivative(z):
     return (z > 0).astype(float)
-    
+
+def _loss_binary(y, y_hat):
+    m = y.shape[1]
+    y_hat = np.clip(y_hat, 1e-9, 1 - 1e-9) 
+    loss = -np.sum(y * np.log(y_hat) + (1 - y) * np.log(1 - y_hat)) / m
+    return loss
+
+def _loss_binary_derivative(y, y_hat):
+    m = y.shape[1]
+    y_hat = np.clip(y_hat, 1e-9, 1 - 1e-9)
+    return (-y / y_hat + (1 - y) / (1 - y_hat)) / m
+
 #  Activation functions and their derivatives
 ACTIVATIONS = {
     'relu':    (_relu,    _relu_derivative),
     'sigmoid': (_sigmoid, _sigmoid_derivative),
+}
+
+# Losses functions and their derivatives
+LOSSES = {
+    'binary': (_loss_binary, _loss_binary_derivative),
 }
 
 # Layer class
@@ -67,9 +83,10 @@ class Layer:
 
 # Neural Network class
 class NeuralNetwork:
-    def __init__(self):
+    def __init__(self, loss='binary'):
         self.layers = []
         self.loss_history = []
+        self.loss, self.loss_derivative = LOSSES[loss]
 
     def add(self, layer):
         # Add a layer to the network and initialize it
@@ -83,9 +100,8 @@ class NeuralNetwork:
         return A
 
     def backward(self, y, y_hat):
-        y_hat = np.clip(y_hat, 1e-9, 1 - 1e-9)
-        # Compute dA from the loss function (BCE)
-        dA = -(y / y_hat) + ((1 - y) / (1 - y_hat))
+        # Compute dA from the loss function derivative
+        dA = self.loss_derivative(y, y_hat) # dA = loss_derivative(y, y_hat)
         
         # Reverse loop over each layer to perform backpropagation
         for layer in reversed(self.layers):
@@ -97,10 +113,7 @@ class NeuralNetwork:
             layer.update(learning_rate)
 
     def compute_loss(self, y, y_hat):
-        # BCE
-        m = y.shape[1]
-        y_hat = np.clip(y_hat, 1e-9, 1 - 1e-9) 
-        loss = -np.sum(y * np.log(y_hat) + (1 - y) * np.log(1 - y_hat)) / m
+        loss = self.loss(y, y_hat)
         return loss
 
     def fit(self, X, y, learning_rate, n_iterations, random_seed=None):
@@ -124,11 +137,28 @@ class NeuralNetwork:
             self.loss_history.append(loss) 
 
     def predict(self, X):
+        # Access the number of output neurons in the last layer
+        n_output_last_layer = self.layers[-1].n_output
+
         # Forward pass over all the network
         y_hat = self.forward(X)
-        return (y_hat > 0.5).astype(int)
+
+        if n_output_last_layer == 1: # Binary classification
+            return (y_hat > 0.5).astype(int)
+        else : # Multi-class classification
+            return np.argmax(y_hat, axis=0)
     
     def predict_proba(self, X):
+        # Access the number of output neurons in the last layer
+        n_output_last_layer = self.layers[-1].n_output
+
         # Forward pass without threshold
-        return self.forward(X).flatten()
+        if n_output_last_layer == 1: # Binary classification
+                return self.forward(X).flatten()
+        else : 
+            # For multi-class classification, apply softmax to the output of the last layer
+            logits = self.forward(X)
+            exp_logits = np.exp(logits - np.max(logits, axis=0, keepdims=True)) # for numerical stability
+            probabilities = exp_logits / np.sum(exp_logits, axis=0, keepdims=True)
+            return probabilities.T
 
