@@ -16,7 +16,7 @@
 
 ## 1. The Landscape
 
-The four terms — AI, ML, DL, GenAI — form nested subsets. Each one is a specialization of the one above it.
+The four terms: AI, ML, DL, GenAI, form nested subsets. Each one is a specialization of the one above it.
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -35,9 +35,9 @@ The four terms — AI, ML, DL, GenAI — form nested subsets. Each one is a spec
 
 ### 1.1 Artificial Intelligence
 
-AI is the broadest category. It refers to any computational system designed to simulate cognitive capabilities — reasoning, planning, perception, natural language understanding, decision-making.
+AI is the broadest category. It refers to any computational system designed to simulate cognitive capabilities: reasoning, planning, perception, natural language understanding, decision-making.
 
-The critical distinction from classical software: a classical program encodes explicit rules written by a human (`if temperature > 100: boil`). An AI system **derives its own rules** from data or from interaction with an environment. The rules are not written — they are learned or searched.
+The critical distinction from classical software: a classical program encodes explicit rules written by a human (`if temperature > 100: boil`). An AI system **derives its own rules** from data or from interaction with an environment. The rules are not written, they are learned or searched.
 
 AI encompasses both symbolic approaches (logic-based systems, expert systems, knowledge graphs) and statistical/learning approaches. ML is the dominant paradigm today, but AI is broader than ML.
 
@@ -71,7 +71,7 @@ where $g^{[l]}$ is the activation function at layer $l$.
 
 What makes DL powerful: **representation learning**. Classical ML requires hand-engineered features (a domain expert designs what to feed the model). Deep networks learn their own feature representations directly from raw data (pixels, tokens, waveforms).
 
-The practical limit of DL: it requires large datasets and significant compute. It also sacrifices interpretability — learned representations are distributed across millions of parameters with no direct semantic meaning.
+The practical limit of DL: it requires large datasets and significant compute. It also sacrifices interpretability, learned representations are distributed across millions of parameters with no direct semantic meaning.
 
 ### 1.4 Generative AI
 
@@ -88,7 +88,7 @@ Major architectures:
 | Diffusion                    | Learn to reverse a noise process            | DALL-E, Stable Diffusion |
 | Autoregressive (Transformer) | Predict next token given context            | GPT, Claude, Gemini      |
 
-GenAI is not a new task type — it is a modeling objective (learn $p(x)$ or $p(y \mid x)$) applied to various modalities: text, image, audio, video, code.
+GenAI is not a new task type, it is a modeling objective (learn $p(x)$ or $p(y \mid x)$) applied to various modalities: text, image, audio, video, code.
 
 ---
 
@@ -112,7 +112,7 @@ Examples: linear regression, logistic regression, SVMs, decision trees, neural n
 
 The agent observes unlabeled data $\{x_i\}_{i=1}^n$ and must discover **latent structure** without any supervision signal.
 
-There is no loss defined on labels — the objective is defined intrinsically on the data:
+There is no loss defined on labels, the objective is defined intrinsically on the data:
 
 - **Clustering**: minimize intra-cluster variance, maximize inter-cluster distance
 - **Dimensionality reduction**: find a low-dimensional representation that preserves structure (PCA maximizes explained variance; autoencoders minimize reconstruction loss)
@@ -135,7 +135,7 @@ A special case of unsupervised learning where labels are **generated automatical
 
 Examples:
 
-- Predict the next token in a sequence (language modeling — what GPT does)
+- Predict the next token in a sequence (language modeling, what GPT does)
 - Predict a masked region from context (BERT)
 - Predict the relative position of two image patches
 
@@ -153,9 +153,9 @@ Covered in depth in Section 6.
 
 Predict a discrete class label $y \in \{c_1, c_2, \dots, c_k\}$ from input features $x$.
 
-- **Binary classification**: $y \in \{0, 1\}$ — spam detection, disease diagnosis
-- **Multiclass classification**: $y \in \{0, 1, \dots, k-1\}$ — image recognition, intent detection
-- **Multilabel classification**: $y \in \{0,1\}^k$ — a sample can belong to multiple classes simultaneously
+- **Binary classification**: $y \in \{0, 1\}$: spam detection, disease diagnosis
+- **Multiclass classification**: $y \in \{0, 1, \dots, k-1\}$: image recognition, intent detection
+- **Multilabel classification**: $y \in \{0,1\}^k$: a sample can belong to multiple classes simultaneously
 
 The model outputs a probability distribution over classes via softmax (multiclass) or sigmoid (binary):
 
@@ -165,7 +165,7 @@ The loss is cross-entropy:
 
 $$\mathcal{L} = -\sum_{k} y_k \log \hat{y}_k$$
 
-Key metrics: accuracy, precision, recall, F1, ROC-AUC. Accuracy alone is misleading on imbalanced datasets — a model predicting the majority class always achieves high accuracy.
+Key metrics: accuracy, precision, recall, F1, ROC-AUC. Accuracy alone is misleading on imbalanced datasets, a model predicting the majority class always achieves high accuracy.
 
 ### 3.2 Regression
 
@@ -191,7 +191,7 @@ $R^2 = 1$ is a perfect fit. $R^2 = 0$ means the model does no better than predic
 
 Assign each sample to one of $k$ groups such that samples within a group are more similar to each other than to samples in other groups.
 
-There is no single correct answer — cluster quality depends on the similarity metric and the algorithm.
+There is no single correct answer, cluster quality depends on the similarity metric and the algorithm.
 
 **K-Means** minimizes intra-cluster variance (within-cluster sum of squares):
 
@@ -233,9 +233,9 @@ $$\sigma^2 = \text{irreducible noise in the data}$$
 | **High Variance** | Worst case: consistently wrong and unstable | Unstable but on average correct |
 | **Low Variance**  | Consistently wrong                          | Best case: stable and correct   |
 
-A linear model on a non-linear problem has high bias — it cannot represent the true function no matter how much data you provide.
+A linear model on a non-linear problem has high bias, it cannot represent the true function no matter how much data you provide.
 
-A degree-100 polynomial on 50 data points has high variance — it fits the training data perfectly but produces wildly different predictions when trained on a different sample of 50 points.
+A degree-100 polynomial on 50 data points has high variance, it fits the training data perfectly but produces wildly different predictions when trained on a different sample of 50 points.
 
 ### 4.3 The Trade-off in Practice
 
@@ -248,7 +248,7 @@ This is why regularization works: it adds a penalty on model complexity, accepti
 
 $$\theta^* = \arg\min_\theta \underbrace{\frac{1}{n}\sum_i \mathcal{L}(f_\theta(x_i), y_i)}_{\text{fit the data (reduce bias)}} + \underbrace{\lambda \|\theta\|^2}_{\text{reduce complexity (reduce variance)}}$$
 
-The optimal model sits at the minimum of the total error curve — not the minimum of bias, not the minimum of variance.
+The optimal model sits at the minimum of the total error curve, not the minimum of bias, not the minimum of variance.
 
 ---
 
@@ -312,11 +312,11 @@ $$F_t(x) = F_{t-1}(x) + \eta \cdot h_t(x)$$
 
 where $\eta$ is the learning rate (shrinkage parameter).
 
-With MSE loss, $r_i^{(t)} = y_i - F_{t-1}(x_i)$ — the residuals. This recovers the intuition: each new tree fits the residuals of the previous ensemble.
+With MSE loss, $r_i^{(t)} = y_i - F_{t-1}(x_i)$ the residuals. This recovers the intuition: each new tree fits the residuals of the previous ensemble.
 
 **Why it reduces bias:** each iteration adds a model that corrects systematic errors of the current ensemble. The ensemble progressively approximates a more complex function than any individual weak learner could.
 
-**Variance risk:** boosting with too many iterations overfits — it reduces bias aggressively but variance eventually increases. Regularization (shrinkage $\eta$, tree depth, subsampling) is essential.
+**Variance risk:** boosting with too many iterations overfits, it reduces bias aggressively but variance eventually increases. Regularization (shrinkage $\eta$, tree depth, subsampling) is essential.
 
 **XGBoost / LightGBM / CatBoost** are optimized implementations of gradient boosting with additional regularization and engineering improvements (second-order gradients, histogram-based splits, categorical handling).
 
@@ -338,15 +338,15 @@ With MSE loss, $r_i^{(t)} = y_i - F_{t-1}(x_i)$ — the residuals. This recovers
 
 Reinforcement Learning (RL) is a learning paradigm where an **agent** learns to make decisions by interacting with an **environment** to maximize cumulative **reward**.
 
-Unlike supervised learning, there are no labeled examples. The agent receives a reward signal after taking actions, and must figure out which actions led to good outcomes — often with significant delay (sparse rewards).
+Unlike supervised learning, there are no labeled examples. The agent receives a reward signal after taking actions, and must figure out which actions led to good outcomes, often with significant delay (sparse rewards).
 
 The formal framework is a **Markov Decision Process (MDP)**, defined by the tuple $(\mathcal{S}, \mathcal{A}, P, R, \gamma)$:
 
 - $\mathcal{S}$: state space
 - $\mathcal{A}$: action space
-- $P(s' \mid s, a)$: transition probability — probability of reaching state $s'$ from state $s$ by taking action $a$
+- $P(s' \mid s, a)$: transition probability, probability of reaching state $s'$ from state $s$ by taking action $a$
 - $R(s, a, s')$: reward function
-- $\gamma \in [0, 1)$: discount factor — how much future rewards are worth relative to immediate rewards
+- $\gamma \in [0, 1)$: discount factor, how much future rewards are worth relative to immediate rewards
 
 The **Markov property**: the future depends only on the current state, not on the history of states. $P(s_{t+1} \mid s_t, a_t) = P(s_{t+1} \mid s_0, a_0, \dots, s_t, a_t)$
 
@@ -393,7 +393,7 @@ Maximize expected return $J(\theta) = \mathbb{E}_{\pi_\theta}[G_0]$. The **polic
 
 $$\nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta}\left[\nabla_\theta \log \pi_\theta(a \mid s) \cdot Q^{\pi_\theta}(s, a)\right]$$
 
-- **REINFORCE**: Monte Carlo estimate of the policy gradient — high variance, unbiased.
+- **REINFORCE**: Monte Carlo estimate of the policy gradient, high variance, unbiased.
 - **Actor-Critic**: combine a policy (actor) and a value function (critic) to reduce variance.
 - **PPO (Proximal Policy Optimization)**: clips the policy update to prevent destructive large steps. The dominant algorithm for training LLMs with RLHF.
 
@@ -438,11 +438,11 @@ $$\mathcal{L} = -\frac{1}{T} \sum_{t=1}^T \log P_\theta(x_t \mid x_1, \dots, x_{
 
 This is self-supervised: no human labels are needed. The supervision signal comes directly from the data itself. The model learns to assign high probability to the correct next token across trillions of tokens.
 
-**Emergent capabilities**: at sufficient scale (parameters, data, compute), LLMs exhibit capabilities not explicitly trained for — arithmetic, code generation, few-shot reasoning. These are not fully understood and are an active research area.
+**Emergent capabilities**: at sufficient scale (parameters, data, compute), LLMs exhibit capabilities not explicitly trained for arithmetic, code generation, few-shot reasoning. These are not fully understood and are an active research area.
 
 ### 7.3 Tokenization
 
-LLMs operate on tokens, not raw characters. A tokenizer (e.g., BPE — Byte Pair Encoding) segments text into subword units. "unhappiness" might become `["un", "happiness"]`. The vocabulary is typically 32k–100k tokens.
+LLMs operate on tokens, not raw characters. A tokenizer (e.g., BPE - Byte Pair Encoding) segments text into subword units. "unhappiness" might become `["un", "happiness"]`. The vocabulary is typically 32k–100k tokens.
 
 Tokenization affects model behavior in non-obvious ways: arithmetic is hard because numbers are split inconsistently; some languages are tokenized less efficiently than English; whitespace and punctuation are tokenized explicitly.
 
@@ -464,7 +464,7 @@ Decoding strategies:
 A pre-trained LLM is a general-purpose representation. Adaptation methods:
 
 - **Full fine-tuning**: update all parameters on a task-specific dataset. Expensive, risks catastrophic forgetting.
-- **LoRA (Low-Rank Adaptation)**: freeze the base model, add low-rank matrices $\Delta W = AB$ to each weight matrix. Only $A$ and $B$ are trained — orders of magnitude fewer parameters.
+- **LoRA (Low-Rank Adaptation)**: freeze the base model, add low-rank matrices $\Delta W = AB$ to each weight matrix. Only $A$ and $B$ are trained, orders of magnitude fewer parameters.
 - **Prompt engineering / in-context learning**: no parameter updates. The task is specified in the prompt and the model generalizes from few examples.
 - **RLHF**: described in Section 6.4.
 
@@ -482,7 +482,7 @@ An AI agent is a system that:
 4. Executes actions that affect the environment
 5. Receives feedback (reward, observation, tool output)
 
-The key property distinguishing an agent from a static model: **agency** — the system takes actions that change the state of the world, and adapts its behavior based on outcomes.
+The key property distinguishing an agent from a static model: **agency**, the system takes actions that change the state of the world, and adapts its behavior based on outcomes.
 
 ### 8.2 LLM-based Agents
 
