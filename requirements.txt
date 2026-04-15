@@ -5,6 +5,7 @@ jupyter
 
 # Data visualization
 matplotlib
+streamlit
 
 # Models
 scikit-learn
