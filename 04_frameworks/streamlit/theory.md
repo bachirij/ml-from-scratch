@@ -154,7 +154,7 @@ Streamlit provides two decorators:
 
 ### `st.cache_data`
 
-For functions that return **data**: dataframes, arrays, processed results. The function runs once; subsequent calls with the same arguments return the cached result immediately.
+For functions that return **data**: dataframes, arrays, processed results. The function runs once, subsequent calls with the same arguments return the cached result immediately.
 
 ```python
 @st.cache_data
