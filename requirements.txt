@@ -1,5 +1,6 @@
 # Data 
 numpy
+scipy
 pandas
 jupyter
 

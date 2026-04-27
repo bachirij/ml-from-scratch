@@ -47,7 +47,7 @@ $$Z = XW + b$$
 
 $$\hat{Y} = \text{softmax}(Z)$$
 
-where softmax is applied **row-wise** — each example gets its own probability distribution across K classes.
+where softmax is applied **row-wise**, each example gets its own probability distribution across K classes.
 
 **Shape check**: $(n, d) \cdot (d, K) + (1, K) = (n, K)$ ✓
 
@@ -113,7 +113,7 @@ The combined gradient of the Categorical Cross-Entropy loss through the softmax 
 
 $$\frac{\partial \mathcal{L}}{\partial Z} = \hat{Y} - Y$$
 
-This is the **error signal** — the difference between predicted probabilities and true one-hot labels. This result is not a coincidence: the same simplification occurs with BCE + sigmoid and MSE + linear output. The cross-entropy loss paired with its "natural" output activation always yields this clean gradient.
+This is the **error signal**, the difference between predicted probabilities and true one-hot labels. This result is not a coincidence: the same simplification occurs with BCE + sigmoid and MSE + linear output. The cross-entropy loss paired with its "natural" output activation always yields this clean gradient.
 
 ### Gradients w.r.t. W and b
 

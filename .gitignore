@@ -1,2 +1,4 @@
 __pycache__
 ml_from_scratch.egg-info
+.DS_store
+.cache/
