@@ -8,8 +8,8 @@ Linear regression predicts continuous values: $\hat{y} = Xw + b$ can output any 
 
 Two concrete problems arise if we force linear regression onto a classification task:
 
-1. **Unbounded output** — predicted values like $-3.7$ or $14.2$ have no meaningful interpretation as class probabilities.
-2. **Wrong loss surface** — applying MSE on top of a sigmoid activation makes the loss non-convex, full of local minima. Gradient descent cannot reliably converge.
+1. **Unbounded output**: predicted values like $-3.7$ or $14.2$ have no meaningful interpretation as class probabilities.
+2. **Wrong loss surface**: applying MSE on top of a sigmoid activation makes the loss non-convex, full of local minima. Gradient descent cannot reliably converge.
 
 Logistic regression solves both problems: it wraps the linear output in a **sigmoid function** to constrain predictions to $(0, 1)$, and uses **Binary Cross-Entropy** as the loss function, which produces a convex surface.
 
@@ -29,9 +29,9 @@ $$\sigma(z) = \frac{1}{1 + e^{-z}}$$
 | $+\infty$ | $\to 1$ |
 | $-\infty$ | $\to 0$ |
 
-**Why it works:** For large positive $z$, $e^{-z} \to 0$, so $\sigma(z) \to 1$. For large negative $z$, $e^{-z} \to \infty$, so $\sigma(z) \to 0$. At $z = 0$ the function is exactly $0.5$ — maximum uncertainty.
+**Why it works:** For large positive $z$, $e^{-z} \to 0$, so $\sigma(z) \to 1$. For large negative $z$, $e^{-z} \to \infty$, so $\sigma(z) \to 0$. At $z = 0$ the function is exactly $0.5$, maximum uncertainty.
 
-**Derivative of sigmoid** — used in backpropagation:
+**Derivative of sigmoid**, used in backpropagation:
 
 Starting from the quotient rule applied to $\frac{1}{1 + e^{-z}}$:
 
@@ -48,13 +48,13 @@ The forward pass applies the linear transformation, then passes the result throu
 $$z = Xw + b$$
 $$\hat{y} = \sigma(z) = \frac{1}{1 + e^{-z}}$$
 
-$\hat{y}$ is now a vector of probabilities — each entry represents the estimated probability that the corresponding sample belongs to class 1.
+$\hat{y}$ is now a vector of probabilities, each entry represents the estimated probability that the corresponding sample belongs to class 1.
 
 ---
 
 ## 4. Decision Boundary
 
-To convert probabilities into class labels, we apply a threshold — typically $0.5$:
+To convert probabilities into class labels, we apply a threshold, typically $0.5$:
 
 $$\text{predicted class} = \begin{cases} 1 & \text{if } \hat{y} \geq 0.5 \\ 0 & \text{if } \hat{y} < 0.5 \end{cases}$$
 
@@ -139,7 +139,7 @@ The parameter update rule is unchanged from linear regression:
 $$w \leftarrow w - \alpha \cdot \frac{\partial \mathcal{L}}{\partial w}$$
 $$b \leftarrow b - \alpha \cdot \frac{\partial \mathcal{L}}{\partial b}$$
 
-Where $\alpha$ is the learning rate. The training loop structure is essentially identical — only the forward pass changes.
+Where $\alpha$ is the learning rate. The training loop structure is essentially identical, only the forward pass changes.
 
 **What changes vs. linear regression:**
 - Forward pass: add sigmoid after $Xw + b$
@@ -168,7 +168,7 @@ Because logistic regression outputs class labels (not continuous values), $R^2$ 
 
 $$\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}$$
 
-Proportion of correct predictions. **Misleading on imbalanced datasets** — a model predicting class 0 always scores 95% accuracy if 95% of data is class 0.
+Proportion of correct predictions. **Misleading on imbalanced datasets**, a model predicting class 0 always scores 95% accuracy if 95% of data is class 0.
 
 ### Precision
 
@@ -180,7 +180,7 @@ Of all samples predicted as class 1, how many actually are? Relevant when **fals
 
 $$\text{Recall} = \frac{TP}{TP + FN}$$
 
-Of all actual class 1 samples, how many did we catch? Relevant when **false negatives are costly** (e.g., cancer screening — missing a positive case is dangerous).
+Of all actual class 1 samples, how many did we catch? Relevant when **false negatives are costly** (e.g., cancer screening, missing a positive case is dangerous).
 
 ### F1 Score
 
