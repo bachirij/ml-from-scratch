@@ -2,12 +2,13 @@ import numpy as np
 
 # Node class to represent each node in the tree
 class Node:
-    def __init__(self, feature, threshold, left, right, value=None):
+    def __init__(self, feature, threshold, left, right, value=None, proba=None):
         self.feature = feature  # Feature index to split on
         self.threshold = threshold  # Threshold value for the split
         self.left = left  # Left child node
         self.right = right  # Right child node
         self.value = value  # Class label for leaf nodes (None for internal nodes)
+        self.proba = proba # Class probabilities for leaf nodes (None for internal nodes)
 
 # DecisionTreeClassifier class
 class DecisionTreeClassifier:
@@ -19,6 +20,17 @@ class DecisionTreeClassifier:
         self.min_samples_leaf = min_samples_leaf
         self.tree = None
 
+    def fit(self, X, y):
+        """
+        Fit the decision tree to the training data.
+        """
+        self.tree = self._build_tree(X, y)
+
+    def predict(self, X):
+        """
+        Predict the class labels for a set of examples.
+        """
+        return np.array([self._predict_one(self.tree, x) for x in X])
     
     def _entropy(self, y):
         """
@@ -121,14 +133,14 @@ class DecisionTreeClassifier:
         # Stopping conditions
         if (self.max_depth is not None and depth >= self.max_depth) or num_labels == 1 or num_samples < self.min_samples_split:
             leaf_value = np.round(np.mean(y))  # Majority class for binary classification
-            return Node(feature=None, threshold=None, left=None, right=None, value=leaf_value)
+            return Node(feature=None, threshold=None, left=None, right=None, value=leaf_value, proba=np.mean(y))
         
         # Find the best split
         feature, threshold = self._best_split(X, y)
         
         if feature is None:
             leaf_value = np.round(np.mean(y))  # Majority class for binary classification
-            return Node(feature=None, threshold=None, left=None, right=None, value=leaf_value)
+            return Node(feature=None, threshold=None, left=None, right=None, value=leaf_value, proba=np.mean(y))
         
         # Split the data
         left_indices = np.where(X[:, feature] <= threshold)[0]
@@ -151,18 +163,23 @@ class DecisionTreeClassifier:
         else:
             return self._predict_one(node.right, x)
         
-    def predict(self, X):
+    def _predict_proba_one(self, node, x):
         """
-        Predict the class labels for a set of examples.
+        Predict the class probabilities for a single example by traversing the tree.
         """
-        return np.array([self._predict_one(self.tree, x) for x in X])
-        
-    def fit(self, X, y):
-        """
-        Fit the decision tree to the training data.
-        """
-        self.tree = self._build_tree(X, y)
+        if node.proba is not None:
+            return node.proba
+        if x[node.feature] <= node.threshold:
+            return self._predict_proba_one(node.left, x)
+        else:
+            return self._predict_proba_one(node.right, x)
 
+    def predict_proba(self, X):
+        """
+        Predict the class probabilities for a set of examples.
+        """
+        return np.array([self._predict_proba_one(self.tree, x) for x in X])
+        
 if __name__ == "__main__":
     # Example usage
     from sklearn.datasets import make_classification
