@@ -4,9 +4,9 @@
 
 Streamlit turns a Python script into a web application. The core proposition: if you already know Python and your libraries (pandas, matplotlib, sklearn, NumPy), you can build an interactive interface around your work without learning HTML, CSS, JavaScript, or any web framework.
 
-The user sees a web page with widgets, charts, and tables. Under the hood, it is a Python script running on a server. There is no separation between frontend and backend — it is all one file.
+The user sees a web page with widgets, charts, and tables. Under the hood, it is a Python script running on a server. There is no separation between frontend and backend, it is all one file.
 
-This is the key difference from tools like Grafana or Tableau: those tools are built around a UI that consumes data. Streamlit is built around code that produces a UI. Anything you can do in Python, you can surface in Streamlit: load a `.pkl` model, read a `.parquet` file, call an API, run NumPy computations, feed data into a Plotly chart.
+This is the key difference from tools like Grafana or Tableau: those tools are built around a UI that consumes data. Streamlit is built around code that produces a UI. Anything you can do in Python, you can surface in Streamlit, load a `.pkl` model, read a `.parquet` file, call an API, run NumPy computations, feed data into a Plotly chart.
 
 ---
 
@@ -14,7 +14,7 @@ This is the key difference from tools like Grafana or Tableau: those tools are b
 
 This is the most important concept to understand. Streamlit has an unconventional execution model that surprises most developers the first time they encounter it.
 
-**When a user interacts with a widget (changes a slider, selects a date, clicks a button) Streamlit reruns the entire Python script from top to bottom.**
+**When a user interacts with a widget, changes a slider, selects a date, clicks a button, Streamlit reruns the entire Python script from top to bottom.**
 
 There is no event listener attached to individual widgets. There is no partial update. The whole script runs again.
 
@@ -118,14 +118,14 @@ st.write(f"You selected: {col}")
 
 Streamlit provides three main layout primitives.
 
-**Sidebar**: a collapsible panel on the left. Any widget placed in `st.sidebar` appears there instead of the main column. Commonly used for filters and configuration.
+**Sidebar** — a collapsible panel on the left. Any widget placed in `st.sidebar` appears there instead of the main column. Commonly used for filters and configuration.
 
 ```python
 with st.sidebar:
     threshold = st.slider("Threshold", 0.0, 1.0, 0.5)
 ```
 
-**Columns**: split the horizontal space into N equal (or weighted) columns.
+**Columns** — split the horizontal space into N equal (or weighted) columns.
 
 ```python
 col1, col2 = st.columns(2)
@@ -137,7 +137,7 @@ with col2:
     st.metric("MAE", 42.3)
 ```
 
-**Expander**: a collapsible section.
+**Expander** — a collapsible section.
 
 ```python
 with st.expander("Show raw data"):
@@ -154,7 +154,7 @@ Streamlit provides two decorators:
 
 ### `st.cache_data`
 
-For functions that return **data**: dataframes, arrays, processed results. The function runs once, subsequent calls with the same arguments return the cached result immediately.
+For functions that return **data**: dataframes, arrays, processed results. The function runs once; subsequent calls with the same arguments return the cached result immediately.
 
 ```python
 @st.cache_data
@@ -287,16 +287,89 @@ def load_data():
 model = load_model()
 df = load_data()
 
-# 3. Sidebar — filters and configuration
+# 3. Sidebar - filters and configuration
 with st.sidebar:
     ...
 
-# 4. Main content — metrics, charts, tables
+# 4. Main content - metrics, charts, tables
 st.title("France electricity demand forecast")
 ...
 ```
 
 `st.set_page_config` must be the first Streamlit call in the script. It controls the browser tab title, the layout (wide or centered), and the sidebar default state.
+
+---
+
+## Multi-page App Architecture
+
+For apps with several distinct sections (overview, analysis, settings), a single `app.py` becomes unwieldy. The standard pattern splits the app into three layers:
+
+```
+dashboard.py          ← entry point: page config, navigation, routing only
+tabs/
+    overview.py       ← one file per page, exposes a single render() function
+    analysis.py
+    settings.py
+utils/
+    data_loader.py    ← all data loading, all cached, nothing else
+    charts.py         ← Plotly figure builders, return go.Figure, never call st.*
+```
+
+### Responsibilities per layer
+
+**`dashboard.py`**: does three things and nothing else: configures the page, renders the sidebar navigation, routes to the active tab. It never loads data or builds charts directly.
+
+**`tabs/*.py`**: each tab is a module with a single public function `render()`. It calls data loaders from `utils/data_loader.py`, calls chart builders from `utils/charts.py`, and handles errors locally. No `st.set_page_config` here, that belongs in `dashboard.py` only.
+
+**`utils/data_loader.py`**: all data loading lives here, nowhere else. Every function is decorated with `st.cache_data` or `st.cache_resource` with an appropriate TTL. Functions raise `FileNotFoundError` on missing files, tabs catch those errors and display `st.error(...)` instead of crashing.
+
+**`utils/charts.py`**: Plotly figure builders. Functions accept a DataFrame and column names, return a `go.Figure`. They never call `st.plotly_chart`, rendering belongs in the tabs.
+
+### Navigation with `st.session_state`
+
+Multi-page navigation is built on `st.session_state`. The active page key is stored once at initialisation and updated when the user clicks a navigation button:
+
+```python
+if "active_page" not in st.session_state:
+    st.session_state.active_page = "overview"
+
+pages = {"overview": "Overview", "analysis": "Analysis"}
+
+for key, label in pages.items():
+    if st.button(label, key=f"nav_{key}", use_container_width=True):
+        st.session_state.active_page = key
+```
+
+### Routing
+
+`dashboard.py` imports and calls only the active tab's `render()` function. Lazy imports (inside the `if` block) avoid loading all tab modules on every rerun:
+
+```python
+page = st.session_state.active_page
+
+if page == "overview":
+    from tabs.overview import render
+    render()
+elif page == "analysis":
+    from tabs.analysis import render
+    render()
+```
+
+### TTL guidelines for `data_loader.py`
+
+| Data type                      | TTL        | Rationale                    |
+| ------------------------------ | ---------- | ---------------------------- |
+| Real-time feed                 | `ttl=300`  | Refreshes every 5 minutes    |
+| Historical / daily             | `ttl=3600` | Stable within a session      |
+| Model artifacts, static config | `ttl=0`    | Never changes after training |
+
+### Adding a new page
+
+1. Create `tabs/new_page.py` with a `render()` function
+2. Add the key/label pair to the `pages` dict in `dashboard.py`
+3. Add an `elif` branch in the routing block
+
+No other file needs to change.
 
 ---
 
@@ -325,7 +398,7 @@ CMD ["streamlit", "run", "app.py", "--server.address", "0.0.0.0"]
 - **Pandas / NumPy**: data manipulation happens in Python as usual; Streamlit only handles the display layer
 - **Plotly**: the recommended charting library for interactive time series in Streamlit
 - **joblib**: model loading follows the same pattern as the FastAPI deployments: load once at startup, use on every request (every rerun in Streamlit's terms)
-- **FastAPI**: complementary, Streamlit calls FastAPI endpoints via `requests` when you want a clean separation between model serving and UI
+- **FastAPI**= complementary; Streamlit calls FastAPI endpoints via `requests` when you want a clean separation between model serving and UI
 
 ---
 
