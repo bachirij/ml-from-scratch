@@ -7,14 +7,15 @@
 
 ## Project Goal
 
-The goal of this project is to serve two from-scratch classifiers as a REST API using FastAPI, and to containerize it with Docker. Rather than running predictions inside a notebook, the models are exposed via HTTP endpoints, meaning any client (a browser, a script, another application) can send tumor measurements and receive a diagnosis prediction in return.
+The goal of this project is to serve three from-scratch classifiers as a REST API using FastAPI, and to containerize it with Docker. Rather than running predictions inside a notebook, the models are exposed via HTTP endpoints, meaning any client (a browser, a script, another application) can send tumor measurements and receive a diagnosis prediction in return.
 
-The API serves two models trained on the same dataset:
+The API serves three models trained on the same dataset:
 
 - A `LogisticRegression` model built from scratch
 - A `NeuralNetwork` model built from scratch
+- A `DecisionTree` model built from scratch
 
-Both predict whether a tumor is **malignant (0)** or **benign (1)** based on 30 numeric features extracted from digitized images of breast mass biopsies.
+All three predict whether a tumor is **malignant (0)** or **benign (1)** based on 30 numeric features extracted from digitized images of breast mass biopsies.
 
 ---
 
@@ -42,7 +43,7 @@ Built from scratch in:
 03_deep_learning/01_neural_network/
 ```
 
-Architecture: `[30, 16, 8, 1]` — 3 hidden layers with ReLU activations, sigmoid output.  
+Architecture: `[30, 16, 8, 1]` - 3 hidden layers with ReLU activations, sigmoid output.  
 Trained with `learning_rate=0.001`, `n_iterations=10000`, `random_seed=42`.  
 Test accuracy: 96.5% — AUC: 0.991.
 
@@ -52,7 +53,24 @@ Saved at:
 03_deep_learning/01_neural_network/models/neural_network_classifier_scratch.pkl
 ```
 
-Both models were trained on the same dataset with the same `train_test_split` (`random_state=42`), so a single `StandardScaler` (fit on `X_train`) applies to both.
+### Decision Tree
+
+Built from scratch in:
+
+```
+02_classical_ml/04_decision_tree/
+```
+
+Trained with `max_depth=5`, `min_samples_split=2`, `criterion='gini'`.  
+Test accuracy: 93% - AUC: 0.922.
+
+Saved at:
+
+```
+02_classical_ml/04_decision_tree/models/decision_tree_classifier_scratch.pkl
+```
+
+All three models were trained on the same dataset with the same `train_test_split` (`random_state=42`), so a single `StandardScaler` (fit on `X_train`) applies to all.
 
 ---
 
@@ -60,16 +78,18 @@ Both models were trained on the same dataset with the same `train_test_split` (`
 
 ```
 05_production/projects/project_breast_cancer/
-├── main.py                                  ← FastAPI app — defines the endpoints
-├── schemas.py                               ← Pydantic input schema
-├── logistic_regression.py                   ← Custom LogisticRegression class
-├── neural_network.py                        ← Custom NeuralNetwork class
-├── logistic_regression_scratch.pkl          ← Trained logistic regression model
-├── neural_network_classifier_scratch.pkl    ← Trained neural network model
-├── scaler.pkl                               ← StandardScaler fit on X_train
-├── Dockerfile                               ← Instructions to build the Docker image
-├── requirements.txt                         ← Python dependencies for the container
-└── project.md                               ← This file
+├── main.py                                    ← FastAPI app, defines the endpoints
+├── schemas.py                                 ← Pydantic input schema
+├── logistic_regression.py                     ← Custom LogisticRegression class
+├── neural_network.py                          ← Custom NeuralNetwork class
+├── decision_tree.py                           ← Custom DecisionTreeClassifier class
+├── logistic_regression_scratch.pkl            ← Trained logistic regression model
+├── neural_network_classifier_scratch.pkl      ← Trained neural network model
+├── decision_tree_classifier_scratch.pkl       ← Trained decision tree model
+├── scaler.pkl                                 ← StandardScaler fit on X_train
+├── Dockerfile                                 ← Instructions to build the Docker image
+├── requirements.txt                           ← Python dependencies for the container
+└── project.md                                 ← This file
 ```
 
 ---
@@ -78,20 +98,22 @@ Both models were trained on the same dataset with the same `train_test_split` (`
 
 ### `main.py`
 
-The core of the API. It creates the FastAPI application, loads both models and the scaler once at startup using the `lifespan` context manager, and defines three endpoints:
+The core of the API. It creates the FastAPI application, loads all three models and the scaler once at startup using the `lifespan` context manager, and defines four endpoints:
 
 - `GET /health` : returns status and the list of available models
 - `POST /predict/logistic_regression` : runs the logistic regression model
 - `POST /predict/neural_network` : runs the neural network model
+- `POST /predict/decision_tree` : runs the decision tree model
 
-Both predict endpoints scale the input features with the shared scaler before running inference, and return both a predicted class and a probability.
+All predict endpoints scale the input features with the shared scaler before running inference, and return both a predicted class and a probability.
 
-The two models are stored in a single `models` dictionary loaded at startup:
+The three models are stored in a single `models` dictionary loaded at startup:
 
 ```python
 models = {
     'logistic_regression': joblib.load("logistic_regression_scratch.pkl"),
-    'neural_network': joblib.load("neural_network_classifier_scratch.pkl")
+    'neural_network': joblib.load("neural_network_classifier_scratch.pkl"),
+    'decision_tree': joblib.load("decision_tree_classifier_scratch.pkl")
 }
 ```
 
@@ -109,13 +131,17 @@ The custom `LogisticRegression` class. joblib needs this file to reconstruct the
 
 The custom `NeuralNetwork` class. Same requirement as above, joblib needs the class definition at load time. The class uses named functions for all activation derivatives (no lambdas) to ensure joblib serialization works correctly.
 
-### `logistic_regression_scratch.pkl` / `neural_network_classifier_scratch.pkl`
+### `decision_tree.py`
 
-The serialized trained models. Both are loaded once at startup using `joblib.load()` and reused for every prediction request.
+The custom `DecisionTreeClassifier` class, along with the `Node` class it depends on. joblib needs both class definitions at load time to reconstruct the model object. The file also contains the `Node` class which represents each node in the tree.
+
+### `logistic_regression_scratch.pkl` / `neural_network_classifier_scratch.pkl` / `decision_tree_classifier_scratch.pkl`
+
+The serialized trained models. All three are loaded once at startup using `joblib.load()` and reused for every prediction request.
 
 ### `scaler.pkl`
 
-The `StandardScaler` fit on `X_train`. Shared by both models since they were trained on the same split. Applied via `scaler.transform()` (not `fit_transform()`) at inference time to avoid data leakage.
+The `StandardScaler` fit on `X_train`. Shared by all three models since they were trained on the same split. Applied via `scaler.transform()` (not `fit_transform()`) at inference time to avoid data leakage.
 
 ### `Dockerfile`
 
@@ -126,7 +152,7 @@ FROM python:3.12-slim
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-COPY main.py schemas.py logistic_regression.py logistic_regression_scratch.pkl neural_network.py neural_network_classifier_scratch.pkl scaler.pkl /app/
+COPY main.py schemas.py logistic_regression.py logistic_regression_scratch.pkl neural_network.py neural_network_classifier_scratch.pkl decision_tree.py decision_tree_classifier_scratch.pkl scaler.pkl /app/
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
@@ -146,7 +172,7 @@ Note: the correct package name for pip is `scikit-learn`, not `sklearn`.
 
 ---
 
-## Option 1 — Run the API Locally (without Docker)
+## Option 1 - Run the API Locally (without Docker)
 
 ### 1. Activate your conda environment
 
@@ -178,7 +204,7 @@ Press `CTRL+C` in the terminal.
 
 ---
 
-## Option 2 — Run the API with Docker
+## Option 2 - Run the API with Docker
 
 ### 1. Make sure Docker is running
 
@@ -229,11 +255,11 @@ Expected response:
 ```json
 {
   "status": "ok",
-  "models": ["logistic_regression", "neural_network"]
+  "models": ["logistic_regression", "neural_network", "decision_tree"]
 }
 ```
 
-### Test `/predict/logistic_regression` and `/predict/neural_network` via `/docs`
+### Test `/predict/logistic_regression`, `/predict/neural_network` and `/predict/decision_tree` via `/docs`
 
 Open your browser and go to:
 
@@ -241,8 +267,8 @@ Open your browser and go to:
 http://localhost:8000/docs
 ```
 
-Click on either predict endpoint, then `Try it out`, paste the following JSON body
-(raw features — the API applies scaling internally), and click `Execute`:
+Click on any predict endpoint, then `Try it out`, paste the following JSON body
+(raw features - the API applies scaling internally), and click `Execute`:
 
 ```json
 {
@@ -303,8 +329,8 @@ A prediction of `1` means the tumor is classified as **benign**.
 - The scaler must be applied with `transform()` at inference time, never `fit_transform()`
 - The `lifespan` context manager is the modern FastAPI pattern for startup logic (replaces `@app.on_event("startup")`)
 - Models and scalers are loaded once at startup and stored as global variables for performance
-- joblib requires the custom class definition to be present at load time, always copy `.py` files alongside `.pkl` files
-- Lambdas cannot be serialized by joblib — use named functions instead
+- joblib requires the custom class definition to be present at load time, always copy `.py` files alongside `.pkl` files, this applies to all helper classes too (e.g. `Node` alongside `DecisionTreeClassifier`)
+- Lambdas cannot be serialized by joblib, use named functions instead
 - NumPy types (e.g. `numpy.int64`, `numpy.float64`) must be cast to native Python types before returning a JSON response
 - The `NeuralNetwork.predict()` output has shape `(1, n_samples)`, use `.flatten()[0]` to extract a scalar
 - Docker packages the app and all its dependencies into a portable container
