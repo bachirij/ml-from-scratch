@@ -12,6 +12,7 @@ plotly
 # Models
 scikit-learn
 torch
+tensorflow
 
 # Production
 joblib
