@@ -2,12 +2,12 @@
 
 ## 1. Intuition
 
-A single decision tree has a fundamental weakness: **high variance**. It is sensitive to the exact training data: small changes in the dataset can produce a completely different tree structure. This makes individual trees prone to overfitting.
+A single decision tree has a fundamental weakness: **high variance**. It is sensitive to the exact training data, small changes in the dataset can produce a completely different tree structure. This makes individual trees prone to overfitting.
 
 Random Forest addresses this with two ideas rooted in statistics:
 
 1. **Wisdom of crowds**: the average of many imperfect, independent predictions is more reliable than any single prediction.
-2. **Decorrelation**: for averaging to reduce variance, the models must make *different* errors. If all trees are similar, their average gains little.
+2. **Decorrelation**: for averaging to reduce variance, the models must make _different_ errors. If all trees are similar, their average gains little.
 
 Random Forest achieves both through **bagging** (independent trees on random subsets of data) and **feature subsampling** (random feature selection at each split).
 
@@ -17,12 +17,12 @@ Random Forest achieves both through **bagging** (independent trees on random sub
 
 An **ensemble method** is a machine learning technique that combines the predictions of multiple models (called **base learners**) to produce a single, more robust prediction. The core idea is that a group of weak or moderate models, when combined appropriately, can outperform any individual model, provided their errors are not perfectly correlated.
 
-| Method | Tree order | Correction mechanism | Aggregation |
-|---|---|---|---|
-| **Bagging** | Parallel, independent | Bootstrap sampling | Average / majority vote |
-| **Random Forest** | Parallel, independent | Bootstrap + feature subsampling | Average / majority vote |
-| **Boosting** | Sequential | Each tree corrects the previous ensemble's residuals | Weighted sum |
-| **Stacking** | Parallel | A meta-model learns to combine base models | Meta-model prediction |
+| Method            | Tree order            | Correction mechanism                                 | Aggregation             |
+| ----------------- | --------------------- | ---------------------------------------------------- | ----------------------- |
+| **Bagging**       | Parallel, independent | Bootstrap sampling                                   | Average / majority vote |
+| **Random Forest** | Parallel, independent | Bootstrap + feature subsampling                      | Average / majority vote |
+| **Boosting**      | Sequential            | Each tree corrects the previous ensemble's residuals | Weighted sum            |
+| **Stacking**      | Parallel              | A meta-model learns to combine base models           | Meta-model prediction   |
 
 Random Forest is an extension of bagging specifically designed for decision trees. The critical addition over plain bagging is **feature subsampling**, which decorrelates the trees.
 
@@ -33,6 +33,7 @@ Random Forest is an extension of bagging specifically designed for decision tree
 Given a training set of $n$ examples, each tree in the forest is trained on a **bootstrap sample**: $n$ examples drawn **with replacement** from the original dataset.
 
 Because sampling is with replacement:
+
 - Some examples appear multiple times in the bootstrap sample.
 - Some examples are never selected.
 
@@ -46,18 +47,22 @@ Therefore, each bootstrap sample contains approximately **63.2% unique examples*
 
 At each node split, instead of evaluating all $d$ features, only a random subset of $k$ features is considered.
 
-**Why this matters:** if one feature is highly predictive, every tree will use it for the first split, producing strongly correlated trees. Averaging correlated trees does not reduce variance much — the trees make similar errors.
+**Why this matters:** if one feature is highly predictive, every tree will use it for the first split, producing strongly correlated trees. Averaging correlated trees does not reduce variance much, the trees make similar errors.
 
-By randomly restricting which features are available at each split, the trees are forced to use different features in different parts of the tree. This **decorrelates the errors**, and averaging then provides a real variance reduction.
+**Why bootstrap sampling alone is not enough:** even with different bootstrap samples, if one feature is highly predictive, _every_ tree will select it for the first split, regardless of which rows are in the sample. The trees end up with similar top-level structure and therefore correlated predictions. Bootstrap sampling diversifies the _rows_; feature subsampling diversifies the _splits_.
+
+By randomly restricting which features are available at each split, the trees are forced to explore different decision paths. This **decorrelates the errors**, and averaging then provides a real variance reduction.
 
 **Typical values for $k$:**
 
-| Task | Common default |
-|---|---|
+| Task           | Common default |
+| -------------- | -------------- |
 | Classification | $k = \sqrt{d}$ |
-| Regression | $k = d / 3$ |
+| Regression     | $k = d / 3$    |
 
 These are heuristics — `max_features` is a hyperparameter you can tune.
+
+**Why $\sqrt{d}$ specifically?** It is an empirical compromise between two competing goals: giving each split enough features to find a meaningful threshold, while restricting enough to force diversity across trees. With $\sqrt{d}$ out of $d$ features, each split sees roughly $1/\sqrt{d}$ of the feature space, a fraction that shrinks as $d$ grows, which becomes more important as dimensionality increases. It was validated empirically across many datasets and became the community default for classification.
 
 ---
 
@@ -110,11 +115,15 @@ $$\hat{y} = \frac{1}{T} \sum_{t=1}^{T} \hat{y}_t(x)$$
 
 Since each tree is trained on ~63.2% of the data, the remaining ~36.8% (OOB samples) can be used as a validation set **for that tree specifically**.
 
-**OOB error estimation:**
+**OOB error estimation — computed per example, not per tree:**
 
 For each training example $x_i$, collect predictions only from trees that did **not** use $x_i$ in their bootstrap sample. Aggregate these predictions (vote or mean). Compare against the true label $y_i$.
 
-The OOB error is the average error across all training examples using only their respective OOB trees.
+The OOB error is then the average of these per-example errors across the full training set:
+
+$$\text{OOB error} = \frac{1}{n} \sum_{i=1}^{n} \mathbf{1}\left[\hat{y}_i^{\text{OOB}} \neq y_i\right] \quad \text{(classification)}$$
+
+This is **not** the average of per-tree OOB errors. Each example $x_i$ is evaluated once, using only the subset of trees that never saw it, which varies per example.
 
 **Property:** OOB error is an approximately unbiased estimate of the test error, without requiring a held-out test set. It is roughly equivalent to leave-one-out cross-validation.
 
@@ -125,10 +134,13 @@ The OOB error is the average error across all training examples using only their
 Random Forest provides a natural estimate of feature importance: **Mean Decrease in Impurity (MDI)**, also called Gini importance.
 
 For each feature $j$:
+
 1. For every node across all trees where feature $j$ was used for a split, record the impurity decrease weighted by the number of samples reaching that node.
 2. Average over all trees.
 
 $$\text{Importance}(j) = \frac{1}{T} \sum_{t=1}^{T} \sum_{\text{nodes where feature } j \text{ is used}} \Delta \text{impurity} \times \frac{n_{\text{node}}}{n}$$
+
+**Reading the formula:** $\Delta \text{impurity}$ is the reduction in Gini (or MSE for regression) at that node. It is weighted by $n_{\text{node}} / n$ because a split at the root affects all samples and should count more than a split deep in the tree that affects only a few. The sum is then averaged over all $T$ trees to get a stable estimate.
 
 Features used at the top of trees (early splits) tend to have higher importance since they affect more samples.
 
@@ -138,15 +150,15 @@ Features used at the top of trees (early splits) tend to have higher importance 
 
 ## 10. Hyperparameters
 
-| Hyperparameter | Description | Typical default |
-|---|---|---|
-| `n_estimators` | Number of trees | 100–500 |
-| `max_depth` | Maximum depth of each tree | None (fully grown) |
-| `max_features` | Features considered per split | `sqrt(d)` or `d/3` |
-| `min_samples_split` | Min samples to split a node | 2 |
-| `min_samples_leaf` | Min samples in a leaf | 1 |
-| `bootstrap` | Whether to use bootstrap sampling | True |
-| `oob_score` | Whether to compute OOB error | False |
+| Hyperparameter      | Description                       | Typical default    |
+| ------------------- | --------------------------------- | ------------------ |
+| `n_estimators`      | Number of trees                   | 100–500            |
+| `max_depth`         | Maximum depth of each tree        | None (fully grown) |
+| `max_features`      | Features considered per split     | `sqrt(d)` or `d/3` |
+| `min_samples_split` | Min samples to split a node       | 2                  |
+| `min_samples_leaf`  | Min samples in a leaf             | 1                  |
+| `bootstrap`         | Whether to use bootstrap sampling | True               |
+| `oob_score`         | Whether to compute OOB error      | False              |
 
 **Effect of `n_estimators`:** more trees always reduces variance, but with diminishing returns. The model does not overfit by adding more trees, it only becomes slower.
 
@@ -154,12 +166,12 @@ Features used at the top of trees (early splits) tend to have higher importance 
 
 ## 11. Bias-Variance Analysis
 
-| Property | Single Tree | Random Forest |
-|---|---|---|
-| Bias | Low (deep trees) | Low (same individual trees) |
-| Variance | **High** | **Low** (averaging decorrelated trees) |
-| Overfitting risk | High | Low |
-| Interpretability | High | Low |
+| Property         | Single Tree      | Random Forest                          |
+| ---------------- | ---------------- | -------------------------------------- |
+| Bias             | Low (deep trees) | Low (same individual trees)            |
+| Variance         | **High**         | **Low** (averaging decorrelated trees) |
+| Overfitting risk | High             | Low                                    |
+| Interpretability | High             | Low                                    |
 
 Random Forest preserves the low bias of individual trees while dramatically reducing variance. The cost is interpretability, you lose the ability to inspect a single tree and understand the full decision logic.
 
