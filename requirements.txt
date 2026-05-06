@@ -13,6 +13,8 @@ plotly
 scikit-learn
 torch
 tensorflow
+xgboost
+lightgbm
 
 # Production
 joblib

@@ -224,6 +224,12 @@ Instead of sorting continuous feature values (O(n log n)), LightGBM bins them in
 | Categorical features   | Requires encoding              | Native support      |
 | Second-order gradients | Yes                            | Yes                 |
 
+**Note**: “Level-wise” versus “leaf-wise” is a tree-growing strategy that is not directly related to histograms.
+
+**Level-wise** means splitting all nodes at the same level before going deeper.
+
+**Leaf-wise** means always splitting the leaf node with the maximum gain, regardless of its depth.
+
 ---
 
 ## 6. Summary: The Boosting Family
