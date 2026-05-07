@@ -1,0 +1,26 @@
+# =============================================================================
+# requirements.txt — Template
+# =============================================================================
+# List all Python packages your app needs to run inside the Docker container.
+# Docker installs these with: pip install -r requirements.txt
+#
+# Do NOT include packages only needed for development (e.g. jupyter, pytest).
+# Keep this list minimal — only what the API actually needs at runtime.
+#
+# Pinning versions (e.g. fastapi==0.110.0) improves reproducibility but
+# requires manual updates. For learning projects, unpinned is fine.
+# =============================================================================
+
+# --- Web framework and server ---
+fastapi
+uvicorn
+
+# --- Model loading ---
+joblib
+
+# --- Numerical computing ---
+numpy
+
+# --- Add any other runtime dependencies below ---
+# scikit-learn   ← needed if your model uses sklearn internally
+# pandas         ← needed if your preprocessing uses DataFrames

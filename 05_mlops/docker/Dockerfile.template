@@ -1,0 +1,51 @@
+# =============================================================================
+# Dockerfile — Minimal Template
+# =============================================================================
+# A Dockerfile is a set of instructions that tells Docker how to build an image
+# of your application. Each line is a layer — Docker caches them, so unchanged
+# layers are not rebuilt on subsequent builds.
+#
+# This file is NOT meant to be run directly — adapt it to your project.
+# To build and run, see docker_commands.md.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# FROM — Base image
+# The starting point for your image. python:3.12-slim is a lightweight Python
+# image — it has Python installed but nothing extra, keeping the image small.
+# Always pin a specific version (e.g. 3.12) for reproducibility.
+# -----------------------------------------------------------------------------
+FROM python:3.12-slim
+
+# -----------------------------------------------------------------------------
+# WORKDIR — Working directory inside the container
+# All subsequent commands (COPY, RUN, CMD) will run from this directory.
+# It is created automatically if it does not exist.
+# /app is a common convention.
+# -----------------------------------------------------------------------------
+WORKDIR /app
+
+# -----------------------------------------------------------------------------
+# COPY requirements.txt + RUN pip install
+# Copy requirements.txt first, then install dependencies.
+# This is done BEFORE copying the rest of the code so Docker can cache this
+# layer — if your code changes but requirements.txt does not, Docker reuses
+# the cached install layer and the build is much faster.
+# -----------------------------------------------------------------------------
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# -----------------------------------------------------------------------------
+# COPY — Copy your project files into the container
+# List all files your app needs to run.
+# ↓ Replace with your own filenames
+# -----------------------------------------------------------------------------
+COPY main.py schemas.py your_model_class.py your_model.pkl /app/
+
+# -----------------------------------------------------------------------------
+# CMD — Command to start the application
+# This runs when the container starts. Use 0.0.0.0 as the host so the app
+# is accessible from outside the container (not just localhost inside it).
+# Do NOT use --reload in production — it is for development only.
+# -----------------------------------------------------------------------------
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
