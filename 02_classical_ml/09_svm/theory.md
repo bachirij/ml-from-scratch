@@ -11,7 +11,8 @@
 7. [Support Vector Regression (SVR)](#7-support-vector-regression-svr)
 8. [Training: the SMO Algorithm](#8-training-the-smo-algorithm)
 9. [Practical Considerations](#9-practical-considerations)
-10. [Review Questions](#10-review-questions)
+10. [When to Use SVM](#10-when-to-use-svm)
+11. [Review Questions](#11-review-questions)
 
 ---
 
@@ -157,7 +158,7 @@ and for $b$:
 
 $$b \leftarrow b - \eta \cdot C \sum_{i: y_i f_i < 1} (-y_i)$$
 
-This is what you will implement in `scratch.ipynb`.
+This is what will be implemented in `scratch.ipynb`.
 
 ---
 
@@ -423,7 +424,43 @@ Use cross-validation (typically 5-fold) to select the optimal pair.
 
 ---
 
-## 10. Review Questions
+## 10. When to Use SVM and SVR
+
+### Use SVM for classification when
+
+**High-dimensional feature spaces with few samples ($n \gg N$):** SVM is one of the few algorithms that remains well-behaved when the number of features exceeds the number of samples. Text classification (TF-IDF vectors), genomics (gene expression arrays), and spectral data all fall in this regime. Logistic regression with regularisation is a reasonable alternative; tree-based methods struggle here.
+
+**Clear margin of separation exists:** on linearly or near-linearly separable data, SVM with a linear kernel is extremely effective and fast. The maximum-margin criterion provides strong generalisation guarantees in this regime.
+
+**Non-linear boundaries with limited data:** when the dataset is small to medium ($N < 10^4$), an RBF SVM can capture complex non-linear boundaries effectively. Random forest and gradient boosting are generally preferred when $N$ is large, but SVM is competitive at small scale.
+
+**Robustness to outliers matters:** the hinge loss ignores correctly classified points beyond the margin entirely — only support vectors contribute to the solution. This makes SVM less sensitive to the bulk of the data distribution than, say, logistic regression, which still accumulates gradient from well-classified points.
+
+**Binary classification tasks requiring a probabilistic output:** sklearn's `SVC` with `probability=True` fits a Platt scaling layer on top of the SVM scores to produce calibrated probabilities, at the cost of an additional cross-validation step.
+
+### Use SVR for regression when
+
+**You want to ignore small residuals explicitly:** SVR's $\varepsilon$-tube means that approximate fits (residuals within tolerance) incur no penalty at all. This is qualitatively different from L2 regression, which penalises every residual quadratically — SVR is more robust to small noise and produces sparser solutions.
+
+**Non-linear regression with limited data and an RBF kernel:** same reasoning as classification — SVR with RBF is competitive on small datasets where the function is smooth but non-linear.
+
+**The target variable has outliers in the residuals:** the $\varepsilon$-insensitive loss combined with a finite $C$ limits the influence of any single point, giving SVR robustness properties similar to robust regression (Huber loss).
+
+### When not to use SVM
+
+**Large datasets ($N > 10^5$):** SMO scales as $O(N^2)$ to $O(N^3)$. Training becomes prohibitively slow. Use `LinearSVC` (liblinear, $O(N)$) for linear problems, or switch to gradient boosting / neural networks for non-linear problems.
+
+**Multiclass problems with many classes:** the number of binary classifiers in OvO grows as $\binom{K}{2}$ — for $K = 100$ classes that is 4950 classifiers. Softmax regression, random forest, or gradient boosting are more natural choices.
+
+**When interpretability is required:** the dual representation in terms of support vectors and kernel evaluations is not easily interpretable. Tree-based models (decision trees, random forest with feature importances) are preferable when explainability matters.
+
+**When features need to be selected:** SVM does not perform feature selection. L1-regularised logistic regression or tree-based feature importances are better suited for understanding which features drive predictions.
+
+**When fast hyperparameter tuning is needed:** SVM requires careful joint tuning of $C$ and $\gamma$, both on logarithmic scales, with cross-validation. Gradient boosting with early stopping is often easier to tune in practice.
+
+---
+
+## 11. Review Questions
 
 **Geometry and margin**
 
