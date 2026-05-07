@@ -1,4 +1,0 @@
-fastapi  
-joblib 
-numpy  
-uvicorn

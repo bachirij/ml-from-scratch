@@ -1,5 +1,0 @@
-fastapi  
-joblib 
-numpy  
-uvicorn
-scikit-learn
