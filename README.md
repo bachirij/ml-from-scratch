@@ -38,7 +38,7 @@ ml-from-scratch/
 │   └── projects/
 │
 ├── 06_reinforcement_learning/  # ML in production
-│ 
+│
 ├── 07_llm_engineering/         # ML in production
 │   ├── 01_fine_tuning/
 │   ├── 02_rag/
@@ -46,7 +46,7 @@ ml-from-scratch/
 │   ├── ab_testing/
 │   └── monitoring/
 │
-└── README.md  
+└── README.md
 ```
 
 ---
@@ -55,32 +55,26 @@ ml-from-scratch/
 
 Every algorithm folder follows the same structure:
 
-| File | Content |
-|---|---|
-| `theory.md` | Intuition, mathematical formulas, derivations, review questions |
-| `scratch.ipynb` | NumPy-only implementation, heavily commented |
-| `sklearn.ipynb` | Production implementation using the library |
-| `project.ipynb` | Full end-to-end example on a real dataset |
+| File            | Content                                                         |
+| --------------- | --------------------------------------------------------------- |
+| `theory.md`     | Intuition, mathematical formulas, derivations, review questions |
+| `scratch.ipynb` | NumPy-only implementation, heavily commented                    |
+| `sklearn.ipynb` | Production implementation using the library                     |
+| `project.ipynb` | Full end-to-end example on a real dataset                       |
 
 ---
 
 ## How to Read This Repo
 
 **To learn an algorithm:**
+
 1. Read `theory.md` - understand the intuition and the math
 2. Read `scratch.ipynb` - see how it is actually implemented
 3. Read `sklearn.ipynb` - see the production version
 4. Read `project.ipynb` - see everything put together on a real problem
-
-**To review quickly:**
-Go directly to `theory.md`.
-
-**To show a recruiter:**
-Point them to `project.ipynb`.
 
 ---
 
 ## Resources
 
 See [resources.md](./resources.md) for the best resources by topic.
-
