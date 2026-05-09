@@ -1,7 +1,7 @@
 # Iris Species Classifier API — FastAPI + Docker
 
 > Part of the `ml-from-scratch` project  
-> Path: `05_mlops/projects/iris/project.md`
+> Path: `09_projects/iris/project.md`
 
 ---
 
@@ -39,7 +39,7 @@ Test accuracy: 100% on a 80/20 train/test split (`random_state=42`).
 ## Project Structure
 
 ```
-02_classical_ml/03_softmax_regression/api/
+09_projects/project_iris/
 ├── main.py                              ← FastAPI app, defines the endpoints
 ├── schemas.py                           ← Pydantic input schema
 ├── softmax_regression.py                ← Custom SoftmaxRegression class
@@ -127,7 +127,7 @@ pip install fastapi uvicorn joblib numpy scikit-learn
 ### 3. Navigate to the project folder
 
 ```bash
-cd path/to/ml-from-scratch/02_classical_ml/03_softmax_regression/api
+cd path/to/ml-from-scratch/09_projects/project_iris
 ```
 
 ### 4. Start the API
@@ -153,7 +153,7 @@ docker --version
 ### 2. Navigate to the project folder
 
 ```bash
-cd path/to/ml-from-scratch/02_classical_ml/03_softmax_regression/api
+cd path/to/ml-from-scratch/09_projects/project_iris
 ```
 
 ### 3. Build the Docker image

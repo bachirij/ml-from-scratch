@@ -1,7 +1,7 @@
 # Breast Cancer Detection API — FastAPI + Docker
 
 > Part of the `ml-from-scratch` project  
-> Path: `05_mlops/projects/project_breast_cancer/project.md`
+> Path: `09_projects/project_breast_cancer/project.md`
 
 ---
 
@@ -40,7 +40,7 @@ Trained on the **sklearn breast cancer dataset** and saved at:
 Built from scratch in:
 
 ```
-03_deep_learning/01_neural_network/
+04_deep_learning/01_neural_network/
 ```
 
 Architecture: `[30, 16, 8, 1]` - 3 hidden layers with ReLU activations, sigmoid output.  
@@ -50,7 +50,7 @@ Test accuracy: 96.5% — AUC: 0.991.
 Saved at:
 
 ```
-03_deep_learning/01_neural_network/models/neural_network_classifier_scratch.pkl
+04_deep_learning/01_neural_network/models/neural_network_classifier_scratch.pkl
 ```
 
 ### Decision Tree
@@ -77,7 +77,7 @@ All three models were trained on the same dataset with the same `train_test_spli
 ## Project Structure
 
 ```
-05_production/projects/project_breast_cancer/
+09_projects/project_breast_cancer/
 ├── main.py                                    ← FastAPI app, defines the endpoints
 ├── schemas.py                                 ← Pydantic input schema
 ├── logistic_regression.py                     ← Custom LogisticRegression class
@@ -189,7 +189,7 @@ pip install fastapi uvicorn joblib numpy scikit-learn
 ### 3. Navigate to the project folder
 
 ```bash
-cd path/to/ml-from-scratch/05_production/projects/project_breast_cancer
+cd path/to/ml-from-scratch/09_projects/project_breast_cancer
 ```
 
 ### 4. Start the API
@@ -215,7 +215,7 @@ docker --version
 ### 2. Navigate to the project folder
 
 ```bash
-cd path/to/ml-from-scratch/05_production/projects/project_breast_cancer
+cd path/to/ml-from-scratch/09_projects/project_breast_cancer
 ```
 
 ### 3. Build the Docker image

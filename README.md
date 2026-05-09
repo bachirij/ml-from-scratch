@@ -17,34 +17,21 @@ ml-from-scratch/
 │
 ├── 02_classical_ml/            # Classical machine learning algorithms
 │
-├── 03_deep_learning/           # Neural networks and deep learning algorithms
-│   ├── 01_neural_network/
-│   ├── 02_cnn/
-│   ├── 03_rnn/
-│   └── 04_transformers/
+├── 03_time_series/            # Time series algorithms
 │
-├── 04_frameworks/              # Frameworks usage
-│   ├── pytorch/
-│   ├── tensorflow_keras/
-│   ├── streamlit/
-│   └── huggingface/
+├── 04_deep_learning/           # Neural networks and deep learning algorithms
 │
-├── 05_mlops/                   # ML in production
-│   ├── fastapi/
-│   ├── mlflow/
-│   ├── docker/
-│   ├── ab_testing/
-│   ├── monitoring/
-│   └── projects/
+├── 05_frameworks/              # Frameworks usage (PyTorch, TensorFlow/Keras, Streamlit, HuggingFace, ...)
 │
-├── 06_reinforcement_learning/  # ML in production
+├── 06_mlops/                   # ML in production (FastAPI, Docker, MLflow, unit tests, A/B testing, monitoring, ...)
 │
-├── 07_llm_engineering/         # ML in production
-│   ├── 01_fine_tuning/
-│   ├── 02_rag/
-│   ├── docker/
-│   ├── ab_testing/
-│   └── monitoring/
+├── 07_reinforcement_learning/  # Reinforcement learning algorithms
+│
+├── 08_genai/                   # Generative AI techniques
+│
+├── 09_projects/                   # Mini-projects
+│
+├── resources.md                # Resources
 │
 └── README.md
 ```

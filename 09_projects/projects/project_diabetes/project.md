@@ -1,7 +1,7 @@
 # Diabetes Prediction API — FastAPI + Docker
 
 > Part of the `ml-from-scratch` project  
-> Path: `05_mlops/projects/project_diabetes/project.md`
+> Path: `09_projects/project_diabetes/project.md`
 
 ---
 
@@ -34,7 +34,7 @@ and saved using joblib at:
 ```
 
 Both the `.pkl` file and the `linear_regression.py` class definition were copied into
-`05_production/project_diabetes/` so the project is self-contained and does not depend
+`09_projects/project_diabetes/` so the project is self-contained and does not depend
 on files outside its own directory.
 
 ---
@@ -42,15 +42,14 @@ on files outside its own directory.
 ## Project Structure
 
 ```
-05_production/projects/project_diabetes/
+09_projects/project_diabetes/
 ├── main.py                         ← FastAPI app — defines the endpoints
 ├── schemas.py                      ← Pydantic input schema — defines what the API expects
 ├── linear_regression.py            ← Custom LinearRegression class (required to load the .pkl)
 ├── linear_regression_scratch.pkl   ← Trained model
 ├── Dockerfile                      ← Instructions to build the Docker image
 ├── requirements.txt                ← Python dependencies for the container
-├── project.md                      ← This file
-└── docker_context.md               ← Context file for the Docker session
+└── project.md                      ← This file
 ```
 
 ---
@@ -135,7 +134,7 @@ pip install fastapi uvicorn joblib numpy
 ### 3. Navigate to the project folder
 
 ```bash
-cd path/to/ml-from-scratch/05_production/projects/project_diabetes
+cd path/to/ml-from-scratch/09_projects/project_diabetes
 ```
 
 You must be in this folder when launching uvicorn — it looks for `main.py` in the
@@ -177,7 +176,7 @@ docker --version
 ### 2. Navigate to the project folder
 
 ```bash
-cd path/to/ml-from-scratch/05_production/project_diabetes
+cd path/to/ml-from-scratch/09_projects/project_diabetes
 ```
 
 ### 3. Build the Docker image
@@ -286,7 +285,7 @@ Expected response:
 ## How to Reuse This Pattern for Another Model
 
 1. Train and save your model with joblib in your algorithm folder
-2. Copy the `.pkl` and the class definition into `05_production/your_project/`
+2. Copy the `.pkl` and the class definition into `09_projects/your_project/`
 3. Update `schemas.py` to match your model's input features and types
 4. Update `main.py` to load the new model and build the correct NumPy array
 5. Update `requirements.txt` if you need additional dependencies
