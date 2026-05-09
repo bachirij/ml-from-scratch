@@ -15,6 +15,7 @@ torch
 tensorflow
 xgboost
 lightgbm
+hdbscan
 
 # Production
 joblib
