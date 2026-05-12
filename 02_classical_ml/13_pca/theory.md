@@ -208,3 +208,53 @@ Answer from memory before opening any notebook.
 9. What is the difference between PCA and feature selection? In what situations would you prefer one over the other?
 
 10. You apply PCA to a dataset and keep components that explain 95% of the variance. A colleague says "you've lost 5% of your data". Is this statement correct? How would you reformulate it precisely?
+
+---
+ 
+## 14. Review Answers
+ 
+**Q1.** PCA measures variance around the mean. If the data is not centered, the first principal component is pulled toward the direction of the mean rather than the direction of
+maximum spread. Centering is a hard requirement, not optional preprocessing.
+ 
+**Q2.** The diagonal contains the **variances** of each individual feature — not eigenvalues. Eigenvalues come later, after decomposing the covariance matrix. The off-diagonal entries
+are the **covariances** between pairs of features i and j: positive means they tend to increase together, negative means they move in opposite directions, zero means no linear
+relationship.
+ 
+**Q3.** After eigendecomposition, sort eigenvalue/eigenvector pairs by descending eigenvalue. Select the top k eigenvectors. The eigenvalue magnitude directly measures how much variance
+is captured by that direction, larger eigenvalue = more informative component.
+ 
+**Q4.** First 2 components: (120 + 80) / (120 + 80 + 15 + 5) = 200 / 220 ≈ **90.9%**.
+
+With all 3: (120 + 80 + 15) / 220 ≈ **97.7%**. 
+
+The right answer depends on the target threshold. If the goal is 95%, keep 3 components. If 90% is sufficient, 2 is enough. 
+
+The decision is always context-dependent.
+ 
+**Q5.** W has shape **(d × k) = (50 × 3)**. Z = X_c @ W has shape **(n × k) = (200 × 3)**.
+
+Each row of Z is the 3-dimensional representation of one sample.
+ 
+**Q6.** Reconstruction formula: $\hat{X} = Z \cdot W^T + \bar{X}$.
+
+The reconstruction error $\frac{1}{n}\|X - \hat{X}\|_F^2$ measures the variance that was discarded, the information contained in the d − k dropped components.
+ 
+**Q7.** PCA is distance-based (it finds directions of maximum variance). 
+
+A feature with variance 10,000 will dominate the first principal component regardless of its actual relevance. 
+
+Example: if one feature is income in dollars (variance ~10⁸) and another is age in years (variance ~100), income will capture PC1 entirely. Standardizing to unit variance beforehand gives each feature equal initial weight.
+ 
+**Q8.**
+```python
+eigenvalues = eigenvalues[::-1]
+eigenvectors = eigenvectors[:, ::-1]
+```
+`np.linalg.eigh` returns eigenvalues in ascending order. Reversing both arrays (note the column-wise reversal `[:, ::-1]` for the eigenvector matrix) puts the most important component first.
+ 
+**Q9.** PCA is **not** feature selection. Feature selection picks a subset of the original features and keeps them unchanged. PCA creates entirely new features (linear combinations
+of all original features) so no original feature is preserved as-is. Prefer feature selection when interpretability matters (you need to know which original variables are
+important). Prefer PCA when you want to maximize retained variance without caring about interpretability, or when features are highly correlated.
+ 
+**Q10.** The statement is imprecise. You have not lost 5% of the *data*, you have lost 5% of the **variance**. That 5% may be noise rather than signal, in which case the
+lower-dimensional representation can actually generalize better. The correct formulation: "we discarded components accounting for 5% of the total variance in the training set."
