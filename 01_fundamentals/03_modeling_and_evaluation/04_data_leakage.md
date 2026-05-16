@@ -325,19 +325,19 @@ Leakage rarely announces itself. These signals suggest it may be present:
 
 ## 10. Connections to Other Concepts
 
-**Train / Validation / Test Split** (`03_evaluation/02_train_test_split.md`):
+**Train / Validation / Test Split** (`03_modeling_and_evaluation/02_train_test_split.md`):
 The split is the first place contamination can occur. Fitting preprocessing before splitting is the canonical example of train-test contamination.
 
-**Cross-Validation** (`03_evaluation/03_cross_validation.md`):
+**Cross-Validation** (`03_modeling_and_evaluation/03_cross_validation.md`):
 CV introduces a fold-level version of the same contamination risk. `Pipeline` is the standard solution.
 
-**Feature Scaling** (`04_data_preprocessing/02_feature_scaling.md`):
+**Feature Scaling** (`02_data_preprocessing/02_feature_scaling.md`):
 StandardScaler is the most commonly leaked transformer. The fit/transform distinction maps directly onto the train/test boundary.
 
 **Time Series** (`03_time_series/`):
 Temporal leakage is one of the most common failure modes in time series modeling. Chronological splits and backward-looking windows are the standard safeguards.
 
-**Regularization** (`02_model_behavior/03_regularization.md`):
+**Regularization** (`04_model_behavior/03_regularization.md`):
 Leakage and lack of regularization can both produce overly optimistic training metrics. They have different root causes and different fixes — leakage is a data pipeline problem, overfitting is a model complexity problem.
 
 ---

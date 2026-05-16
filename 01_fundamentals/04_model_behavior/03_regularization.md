@@ -198,13 +198,13 @@ Wherever you see a hyperparameter that limits model capacity — `C`, `lambda`, 
 
 ## 8. Connections to Other Concepts
 
-**Bias-Variance Trade-off** (`02_model_behavior/01_bias_variance.md`):
+**Bias-Variance Trade-off** (`04_model_behavior/01_bias_variance.md`):
 Regularization is the principal lever for managing this trade-off. Increasing $\lambda$ increases bias and decreases variance. The goal is the value of $\lambda$ that minimizes total error.
 
-**Cross-Validation** (`03_evaluation/03_cross_validation.md`):
+**Cross-Validation** (`03_modeling_and_evaluation/03_cross_validation.md`):
 The only principled way to choose $\lambda$ is cross-validation. The two concepts are inseparable in practice.
 
-**Feature Scaling** (`04_data_preprocessing/02_feature_scaling.md`):
+**Feature Scaling** (`02_data_preprocessing/02_feature_scaling.md`):
 Regularization penalizes weight magnitude. If features are on different scales, the penalty affects weights unevenly — features on large scales get their weights shrunk more. **Always scale features before applying regularization.**
 
 **Linear Regression — Ridge and Lasso** (`02_classical_ml/01_linear_regression/`):

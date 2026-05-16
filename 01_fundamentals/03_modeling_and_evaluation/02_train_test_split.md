@@ -178,16 +178,16 @@ This is covered in full in `03_evaluation/04_data_leakage.md`.
 
 ## 8. Connections to Other Concepts
 
-**Cross-Validation** (`03_evaluation/03_cross_validation.md`):
+**Cross-Validation** (`03_modeling_and_evaluation/03_cross_validation.md`):
 Cross-validation replaces the fixed validation set by rotating which portion of training data is used for validation. The test set discipline remains the same.
 
-**Data Leakage** (`03_evaluation/04_data_leakage.md`):
+**Data Leakage** (`03_modeling_and_evaluation/04_data_leakage.md`):
 The split is the first place leakage can occur. Fitting preprocessing before splitting is the canonical example.
 
-**Feature Scaling** (`04_data_preprocessing/02_feature_scaling.md`):
+**Feature Scaling** (`02_data_preprocessing/02_feature_scaling.md`):
 Scalers must be fit on training data only and applied identically to validation and test data. The split determines when you are allowed to call `fit`.
 
-**Bias-Variance Trade-off** (`02_model_behavior/01_bias_variance.md`):
+**Bias-Variance Trade-off** (`04_model_behavior/01_bias_variance.md`):
 The train/test gap is the practical diagnostic for bias and variance. High training error → high bias. Large train/test gap → high variance.
 
 **Time Series** (`03_time_series/`):

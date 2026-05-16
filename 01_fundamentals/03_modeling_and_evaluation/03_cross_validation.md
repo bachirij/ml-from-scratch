@@ -274,16 +274,16 @@ For deep learning, the standard alternative to cross-validation is **early stopp
 
 ## 9. Connections to Other Concepts
 
-**Train / Validation / Test Split** (`03_evaluation/02_train_test_split.md`):
+**Train / Validation / Test Split** (`03_modeling_and_evaluation/02_train_test_split.md`):
 Cross-validation replaces the fixed validation set. The test set discipline is unchanged.
 
-**Data Leakage** (`03_evaluation/04_data_leakage.md`):
+**Data Leakage** (`03_modeling_and_evaluation/04_data_leakage.md`):
 Fitting preprocessing before CV is data leakage. `Pipeline` is the standard fix.
 
-**Regularization** (`02_model_behavior/03_regularization.md`):
+**Regularization** (`04_model_behavior/03_regularization.md`):
 The regularization strength $\lambda$ is a hyperparameter chosen by cross-validation. The two concepts are inseparable in any real modeling workflow.
 
-**Bias-Variance Trade-off** (`02_model_behavior/01_bias_variance.md`):
+**Bias-Variance Trade-off** (`04_model_behavior/01_bias_variance.md`):
 The CV score is an estimate of generalization error — the quantity the bias-variance decomposition explains. The standard deviation across folds measures the variance of that estimate.
 
 **SVM** (`02_classical_ml/09_svm/`):

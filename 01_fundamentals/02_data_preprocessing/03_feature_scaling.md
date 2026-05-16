@@ -263,13 +263,13 @@ Refitting the scaler on production data introduces distribution shift — the mo
 
 ## 9. Connections to Other Concepts
 
-**Data Leakage** (`03_evaluation/04_data_leakage.md`):
+**Data Leakage** (`03_modeling_and_evaluation/04_data_leakage.md`):
 Fitting a scaler on the full dataset before splitting is the canonical example of train-test contamination. The fit-transform discipline is what prevents it.
 
-**Regularization** (`02_model_behavior/03_regularization.md`):
+**Regularization** (`04_model_behavior/03_regularization.md`):
 Regularization penalizes weight magnitude. Without scaling, weights for large-scale features are numerically small (to produce reasonable predictions), so they are penalized less — even if those features are no more important. Scaling ensures regularization is applied evenly across all features.
 
-**Cross-Validation** (`03_evaluation/03_cross_validation.md`):
+**Cross-Validation** (`03_modeling_and_evaluation/03_cross_validation.md`):
 `Pipeline` is required to prevent the scaler from seeing validation fold data during CV. Scaling before `cross_val_score` is a data leakage bug.
 
 **Gradient Descent** (`02_classical_ml/01_linear_regression/`):
@@ -281,7 +281,7 @@ KNN is one of the most scale-sensitive algorithms — distance is the entire pre
 **PCA** (`02_classical_ml/13_pca/`):
 PCA must be preceded by standardization. Without it, the principal components reflect the scale of features rather than their variance structure.
 
-**Production / API** (`05_production/`):
+**Production / API** (`06_mlops/`):
 The fitted scaler must be serialized alongside the model and loaded at inference time. Forgetting to save the scaler, or refitting it on incoming data, is a deployment bug.
 
 ---

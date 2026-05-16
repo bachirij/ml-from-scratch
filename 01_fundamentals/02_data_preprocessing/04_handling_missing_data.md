@@ -292,16 +292,16 @@ model.fit(X_train, y_train)  # X_train may contain NaN
 
 ## 9. Connections to Other Concepts
 
-**Data Leakage** (`03_evaluation/04_data_leakage.md`):
+**Data Leakage** (`03_modeling_and_evaluation/04_data_leakage.md`):
 Fitting an imputer on the full dataset before splitting is train-test contamination. The training mean or median is computed using test samples — the same class of bug as a misfitted scaler.
 
-**Feature Scaling** (`04_data_preprocessing/02_feature_scaling.md`):
+**Feature Scaling** (`02_data_preprocessing/02_feature_scaling.md`):
 Imputation must precede scaling in a pipeline. Both steps require the same fit-transform discipline. KNN imputation additionally requires scaling before the imputer runs — the two are interdependent.
 
-**Cross-Validation** (`03_evaluation/03_cross_validation.md`):
+**Cross-Validation** (`03_modeling_and_evaluation/03_cross_validation.md`):
 `Pipeline` ensures the imputer is fit only on each fold's training portion. Without it, mean/median statistics from validation folds contaminate the training signal.
 
-**Data Leakage — MNAR** (`03_evaluation/04_data_leakage.md`):
+**Data Leakage — MNAR** (`03_modeling_and_evaluation/04_data_leakage.md`):
 When missingness is informative (MNAR), imputing without an indicator column effectively hides a signal that the model should be allowed to use. This is not strictly leakage, but it is a loss of information that can degrade performance.
 
 **Tree-based models** (`02_classical_ml/05_regression_tree/`, `06_random_forest/`, `07_gradient_boosting/`):

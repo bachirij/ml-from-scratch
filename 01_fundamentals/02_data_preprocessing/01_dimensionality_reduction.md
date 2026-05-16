@@ -1,4 +1,4 @@
-# Dimensionality Reduction and Feature Engineering
+# Dimensionality Reduction
 
 ## Table of Contents
 
@@ -6,9 +6,8 @@
 2. [Dimensionality Reduction](#2-dimensionality-reduction)
 3. [Linear Methods: PCA](#3-linear-methods-pca)
 4. [Non-Linear Methods: t-SNE and UMAP](#4-non-linear-methods-t-sne-and-umap)
-5. [Feature Engineering](#5-feature-engineering)
-6. [How They Work Together](#6-how-they-work-together)
-7. [Review Questions](#7-review-questions)
+5. [How It Fits Into a Pipeline](#5-how-it-fits-into-a-pipeline)
+6. [Review Questions](#6-review-questions)
 
 ---
 
@@ -60,7 +59,7 @@ Projecting $X$ onto the first $k$ principal components gives a $k$-dimensional r
 
 - Principal components are **orthogonal** to each other: they are uncorrelated by construction.
 - The first component explains the most variance, the second the most of what remains, and so on.
-- PCA is a **linear transformation**, it cannot capture non-linear structure.
+- PCA is a **linear transformation**: it cannot capture non-linear structure.
 - The new axes (principal components) are **not interpretable** in terms of the original features; they are linear combinations of all of them.
 
 ### When to use it
@@ -68,7 +67,7 @@ Projecting $X$ onto the first $k$ principal components gives a $k$-dimensional r
 - Pre-processing before a supervised model when features are highly correlated.
 - Noise reduction: the last principal components tend to capture noise; dropping them can improve downstream model performance.
 - Visualization: projecting to 2 or 3 components for a quick inspection of structure.
-- As a pre-processing step before clustering when the original space is high-dimensional.
+- Pre-processing before clustering when the original space is high-dimensional.
 
 The full mathematical derivation and scratch implementation are in `02_classical_ml/13_pca/`.
 
@@ -80,13 +79,13 @@ When the data has complex, non-linear structure, projecting onto a linear subspa
 
 ### t-SNE
 
-**t-Distributed Stochastic Neighbor Embedding (t-SNE)** converts pairwise distances between points into probabilities, points that are close in the original space have high probability of being neighbors, and then finds a low-dimensional layout that preserves those neighborhood probabilities as closely as possible.
+**t-Distributed Stochastic Neighbor Embedding (t-SNE)** converts pairwise distances between points into probabilities, points that are close in the original space have a high probability of being neighbors, and then finds a low-dimensional layout that preserves those neighborhood probabilities as closely as possible.
 
 Key characteristics:
 - Excellent at revealing **local structure** and tight clusters in 2D.
 - Does **not** preserve global structure: distances between clusters in the 2D plot are not meaningful.
 - Does **not scale well**: $O(n^2)$ complexity, impractical above ~10,000 points without approximations.
-- Sensitive to hyperparameters (perplexity, learning rate), different runs can produce visually different layouts.
+- Sensitive to hyperparameters (perplexity, learning rate); different runs can produce visually different layouts.
 - **Not suitable as a pre-processing step** for downstream models: the mapping is non-parametric and cannot be applied to new points.
 
 ### UMAP
@@ -112,71 +111,23 @@ Key characteristics:
 
 ---
 
-## 5. Feature Engineering
+## 5. How It Fits Into a Pipeline
 
-Feature engineering is the process of transforming raw data into representations that make it easier for a model to learn the underlying pattern. Unlike dimensionality reduction, it is not a single algorithm, it is a practice that combines domain knowledge, statistical reasoning, and experimentation.
+Dimensionality reduction does not operate in isolation. A few common patterns:
 
-### Feature selection
+**DR → clustering**: reducing dimensions before clustering removes noise and mitigates the curse of dimensionality, improving the quality of cluster assignments.
 
-Not all features are equally informative. Including irrelevant or redundant features increases noise, slows training, and can hurt generalization.
+**DR → supervised learning**: PCA components can replace correlated original features with uncorrelated ones as input to a downstream model. The eigenfaces approach is the canonical example: PCA on face images, then an SVM trained on the projected features.
 
-**Filter methods** rank features independently of any model using statistical criteria (correlation with the target, variance, mutual information). Fast but ignore interactions between features.
+**Feature engineering → DR**: transformations (standardization, log scaling, polynomial features) should generally be applied *before* dimensionality reduction, because DR operates on the feature space and that space should be clean and well-scaled before projecting.
 
-**Wrapper methods** evaluate subsets of features by training a model on each subset and measuring performance. Accurate but computationally expensive.
+> Feature engineering, including feature selection and creation, is covered separately in `02_feature_engineering.md`.
 
-**Embedded methods** perform selection as part of the training process. L1 regularization (Lasso) is the canonical example: it pushes irrelevant weights to exactly zero, implicitly selecting features. This is covered in detail in `01_fundamentals/04_bias_variance.md`.
-
-**Clustering-based selection**: when features are numerous and correlated, clustering can group them by similarity. A representative feature from each cluster is then selected, reducing redundancy while preserving coverage. This is a form of unsupervised feature selection.
-
-### Feature transformation
-
-Raw features often violate assumptions made by learning algorithms or simply encode information in a form that is hard to learn from.
-
-Common transformations:
-- **Standardization** ($\mu = 0$, $\sigma = 1$): required for distance-based algorithms and gradient-based optimization. Always fit on training data only to avoid data leakage.
-- **Log transformation**: compresses right-skewed distributions, stabilizes variance.
-- **Polynomial features**: explicitly adds interactions ($x_1 x_2$) and non-linear terms ($x_1^2$). Expands the hypothesis class of linear models at the cost of increased variance.
-- **Binning**: converts a continuous feature into ordinal categories. Useful when the relationship with the target is non-linear and step-like.
-
-### Feature creation
-
-Sometimes the most informative features are not present in the raw data but can be derived from it. Examples:
-- Extracting hour-of-day, day-of-week, or month from a timestamp.
-- Computing a ratio between two existing features.
-- Using cluster assignments as a new categorical feature, a direct link between clustering and feature engineering.
-
-### The data leakage risk
-
-Any transformation that uses statistics from the data (mean, standard deviation, PCA components, cluster centroids) must be **fit on the training set only** and then applied to the validation and test sets. Fitting on the full dataset before splitting causes data leakage: the model has indirect access to test set information during training, producing optimistic evaluation metrics that do not reflect real-world performance.
+One important constraint applies regardless of which DR method you use: any transformation that computes statistics from the data (PCA components, UMAP embedding) must be **fit on the training set only** and then applied to validation and test sets. Fitting on the full dataset before splitting causes data leakage.
 
 ---
 
-## 6. How They Work Together
-
-Dimensionality reduction and feature engineering are not independent pipelines, they interact.
-
-**Clustering → feature engineering**: cluster assignments from an unsupervised model can be appended as a new feature in a supervised model, encoding non-linear group structure that the supervised model might otherwise miss.
-
-**Dimensionality reduction → clustering**: reducing dimensions before clustering removes noise and mitigates the curse of dimensionality, improving the quality of cluster assignments.
-
-**Dimensionality reduction → feature engineering**: PCA components can serve as input features to a supervised model, replacing the original correlated features with uncorrelated ones. This is exactly the eigenfaces example: PCA on unlabeled face images, then an SVM trained on the projected features.
-
-**Clustering → feature selection**: clustering features (not observations) groups redundant features together. Selecting one representative per cluster is a form of dimensionality reduction.
-
-A common practical pipeline:
-
-```
-Raw data
-    → Feature engineering (transformations, creation)
-    → Dimensionality reduction (PCA for linear data, UMAP for complex data)
-    → Clustering or supervised learning
-```
-
-The order matters: feature engineering typically precedes dimensionality reduction because DR operates on the feature space, and that space should be clean and well-scaled before projecting.
-
----
-
-## 7. Review Questions
+## 6. Review Questions
 
 Answer from memory before checking the content above.
 
@@ -188,8 +139,6 @@ Answer from memory before checking the content above.
 
 4. You want to visualize a 500-dimensional text embedding dataset to check whether clusters exist. Would you use PCA, t-SNE, or UMAP? Justify your choice. Would your answer change if you also needed to project new documents at inference time?
 
-5. Explain why a StandardScaler must be fit on the training set only. What goes wrong if you fit it on the full dataset before splitting?
+5. A colleague proposes the following pipeline: apply PCA to the full dataset, then split into train and test. What is wrong with this? How would you fix it?
 
-6. You have a dataset with 200 features. You suspect many are redundant. Describe two approaches for reducing this redundancy — one using clustering, one using regularization.
-
-7. A colleague proposes the following pipeline: apply PCA to the full dataset, then split into train and test. What is wrong with this? How would you fix it?
+6. t-SNE and UMAP both produce 2D visualizations of high-dimensional data. Name two concrete differences between them that would influence which one you choose.
